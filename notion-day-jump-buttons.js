@@ -166,7 +166,7 @@
 		});
 	}
 
-	const OFFSET = 200;
+	const VISIBILITY_OFFSET = 90;
 
 	function getActiveGroup(groups, OFFSET = 300) {
 
@@ -174,7 +174,7 @@
 
 		for (const g of groups) {
 			const top = g.el.getBoundingClientRect().top;
-			if (top - OFFSET <= 0) active = g;
+			if (top - VISIBILITY_OFFSET <= 0) activeGroup = g;
 			else break;
 		}
 		return active;
