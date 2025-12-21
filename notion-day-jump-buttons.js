@@ -18,6 +18,7 @@
 			align-items: flex-start;
 			gap: 6px;
 			z-index: 9999;
+			width: max-content;
 		}
 
 		.tm-notion-day-jump-btn {
