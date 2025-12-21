@@ -129,29 +129,26 @@
 		buttonsContainer.id = BTNS_CONTAINER_ID;
 		buttonsContainer.classList.add('tm-notion-day-jump-btns-container');
 
-		// root.appendChild(buttonsContainer);
 		return buttonsContainer;
 	}
 
 	// add or update day buttons
 	function updateButtons() {
 
-		// console.log('refreshButtons');
-
 		// reset to empty
 		// buttonsContainer.innerHTML = "";
 		// get existing buttons
 		const existingLabels = [...buttonsContainer.children].map(btn => btn.textContent);
-		// console.log(`refreshButtons - existingLabels: ${existingLabels.join(' ')}`);
-		// console.log(`refreshButtons - existingLabels`, existingLabels);
+		// console.log(`updateButtons - existingLabels: ${existingLabels.join(' ')}`);
+		// console.log(`updateButtons - existingLabels`, existingLabels);
 		// [...buttonsContainer.children].forEach(btn => console.log(btn.label));
 
 		const groupElements = findGroupElements();
 		if (!groupElements.length) {
-			// console.log('refreshButtons - found no group');
+			// console.log('updateButtons - found no group');
 			return;
 		}
-		// else console.log(`refreshButtons - found ${groupElements.length} groups`); 
+		// else console.log(`updateButtons - found ${groupElements.length} groups`); 
 
 		groupElements.forEach(({ label, el }) => {
 			
