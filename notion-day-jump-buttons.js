@@ -40,7 +40,7 @@
 
 
 	const GROUP_SELECTOR = ".notion-frame .notion-collection_view-block"; 
-	const BTNS_CONTAINER_ID = "tm-notion-day-jump";
+	const BTNS_CONTAINER_ID = "tm-notion-day-jump-btns-container";
 	const LIST_VIEW_ROOT_SELECTOR =
 	".notion-page-content > .notion-selectable.notion-transclusion_reference-block";
 
@@ -121,7 +121,7 @@
 		scroller.focus?.();
 	}
 
-	function makeButtonsContainer() {
+	function buildButtonsContainer() {
 		// let buttonsContainer = document.getElementById(BTNS_CONTAINER_ID);
 		if (buttonsContainer) return buttonsContainer;
 
@@ -133,8 +133,8 @@
 		return buttonsContainer;
 	}
 
-	// refreshButtons recreates buttons and therefore active classes are skipped
-	function refreshButtons() {
+	// add or update day buttons
+	function updateButtons() {
 
 		// console.log('refreshButtons');
 
@@ -200,7 +200,7 @@
 		);
 	}
 
-	function reposition() {
+	function updateContainerPosition() {
 		if (!root || !buttonsContainer) return;
 
 		const target = document.querySelector(TARGET_SELECTOR);
@@ -220,7 +220,7 @@
 		if (!listRoot) return;
 
 		listObserver = new MutationObserver(() => {
-			refreshButtons();
+			updateButtons();
 		});
 
 		listObserver.observe(listRoot, {
@@ -235,13 +235,14 @@
 			root.style.position = "relative";
 		}
 
-		const b = makeButtonsContainer();
+		const b = buildButtonsContainer();
 		if (!root.contains(b)) root.appendChild(b);
 
 		// refreshStyle();
-		reposition(); // reposition container
-		refreshButtons(); // first call
-		observeListView(); // will trigger refreshButtons() if listview changes
+		updateContainerPosition(); // first call
+		updateButtons(); // first call
+		// updateActiveButton(); // first call
+		observeListView(); // will trigger updateButtons() if listview changes
 	}
 
 	// wait once for stable root
@@ -255,9 +256,9 @@
 	
 	attachObserver.observe(document.body, { childList: true, subtree: true });
 
-	window.addEventListener("resize", reposition);
-	window.addEventListener("scroll", reposition, true);
-	window.addEventListener("scroll", updateActiveGroup, true);
+	window.addEventListener("resize", updateContainerPosition);
+	window.addEventListener("scroll", updateContainerPosition, true);
+	window.addEventListener("scroll", updateActiveButton, true);
 	// window.addEventListener("popstate", refreshStyle);
 	// window.addEventListener("visibilitychange", refreshStyle);
 
