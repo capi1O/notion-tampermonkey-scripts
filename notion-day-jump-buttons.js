@@ -168,32 +168,49 @@
 
 	const VISIBILITY_OFFSET = 90;
 
-	function getActiveGroup(groups, OFFSET = 300) {
+	let lastActiveGroup = null;
+	function getActiveGroup(groups) {
 
-		let active; // = groups[0];
+		let activeGroup;
 
 		for (const g of groups) {
 			const top = g.el.getBoundingClientRect().top;
 			if (top - VISIBILITY_OFFSET <= 0) activeGroup = g;
 			else break;
 		}
-		return active;
+
+		// if no group currently visible, return the last active one or first one if none (on load)
+		if (!activeGroup) activeGroup = lastActiveGroup || groups[0];
+
+		if (activeGroup != lastActiveGroup) {
+			// keep ref for next run
+			lastActiveGroup = activeGroup;
+			return activeGroup;
+		}
+		// otherwise return null to indicate no change
+		else return null;
+
 	}
 
-	function updateActiveGroup() {
-		if (!buttonsContainer) return;
-
-		const groups = findGroupElements();
-		if (!groups.length) return;
-
-		const active = getActiveGroup(groups, OFFSET);
-
-		// if no active group find, return so we keep the last active one
-		if (!active) {
-			console.log('updateActiveGroup - found no active group');
+	function updateActiveButton() {
+		if (!buttonsContainer) {
+			console.log('updateActiveButton - found no buttons container');
 			return;
 		}
-		else console.log(`updateActiveGroup - found active group ${active.label}`);
+		const groups = findGroupElements();
+		if (!groups.length) {
+			console.log('updateActiveButton - found no groups');
+			return;
+		}
+
+		const active = getActiveGroup(groups);
+
+		// if no active group returned it means it has not changed, return so we don't update unnecessarily
+		if (!active) {
+			console.log('updateActiveButton - found no active group');
+			return;
+		}
+		else console.log(`updateActiveButton - found active group ${active.label}`);
 
 		[...buttonsContainer.children].forEach(btn =>
 			btn.classList.toggle("active", btn.textContent === active.label)
