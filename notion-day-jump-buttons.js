@@ -4,6 +4,29 @@
 // ==/UserScript==
 
 (() => {
+
+	// CSS styling
+	const style = document.createElement('style');
+	style.textContent = `
+		.tm-notion-day-jump-btn {
+			padding: 6px 10px;
+			border-radius: 6px;
+			border: none;
+			background: rgb(244,245,247);
+			cursor: pointer;
+			font-size: 13px;
+			text-align: left;
+			color: #333;
+		}
+
+		.tm-notion-day-jump-btn.active {
+			background: rgb(35,131,226);
+			color: #fff;
+		}
+	`;
+	document.head.appendChild(style);
+
+
 	const GROUP_SELECTOR = ".notion-frame .notion-collection_view-block"; 
 	const BTNS_CONTAINER_ID = "tm-notion-day-jump";
 	const LIST_VIEW_ROOT_SELECTOR =
@@ -85,56 +108,51 @@
 		return buttonsContainer;
 	}
 
+	// refreshButtons recreates buttons and therefore active classes are skipped
 	function refreshButtons() {
 
-		console.log('refreshButtons');
+		// console.log('refreshButtons');
 
 		// reset to empty
-		buttonsContainer.innerHTML = "";
+		// buttonsContainer.innerHTML = "";
+		// get existing buttons
+		const existingLabels = [...buttonsContainer.children].map(btn => btn.textContent);
+		// console.log(`refreshButtons - existingLabels: ${existingLabels.join(' ')}`);
+		// console.log(`refreshButtons - existingLabels`, existingLabels);
+		// [...buttonsContainer.children].forEach(btn => console.log(btn.label));
 
 		const groupElements = findGroupElements();
 		if (!groupElements.length) {
-			console.log('refreshButtons - found no group');
+			// console.log('refreshButtons - found no group');
 			return;
 		}
-		else console.log(`refreshButtons - found ${groupElements.length} groups`); 
+		// else console.log(`refreshButtons - found ${groupElements.length} groups`); 
 
 		groupElements.forEach(({ label, el }) => {
-
-			const btn = document.createElement("button");
-			btn.textContent = label;
-
-			Object.assign(btn.style, {
-				padding: "6px 10px",
-				borderRadius: "6px",
-				border: "none",
-				background: "rgb(244,245,247)",
-				cursor: "pointer",
-				fontSize: "13px",
-				textAlign: "left",
-				color: "red"
-			});
-
-			btn.onclick = () => scrollToGroup(el);
-			buttonsContainer.appendChild(btn);
+			
+			// create button if it does not already exists
+			if (!existingLabels.includes(label)) {
+				const btn = document.createElement("button");
+				btn.textContent = label;
+				btn.classList.add('tm-notion-day-jump-btn');
+				btn.onclick = () => scrollToGroup(el);
+				buttonsContainer.appendChild(btn);
+			}
 		});
 	}
 
-	// check day group currently visible
-	// function refreshStyle() {
-	//   if (!buttonsContainer) return;
-	//   if (isSidePeekOpen()) {
-	//     buttonsContainer.style.background = "rgb(35,131,226)";
-	//     buttonsContainer.style.color = "#fff";
-	//   } else {
-	//     buttonsContainer.style.background = "rgb(244,245,247)";
-	//     buttonsContainer.style.color = "#333";
-	//   }
-	// }
+	const OFFSET = 200;
 
-	function updateButtonStyle(btn, isVisible) {
-		btn.style.background = isVisible ? "rgb(35,131,226)" : "rgb(244,245,247)";
-		btn.style.color = isVisible ? "#fff" : "#333";
+	function getActiveGroup(groups, OFFSET = 300) {
+
+		let active; // = groups[0];
+
+		for (const g of groups) {
+			const top = g.el.getBoundingClientRect().top;
+			if (top - OFFSET <= 0) active = g;
+			else break;
+		}
+		return active;
 	}
 
 	function updateActiveGroup() {
@@ -143,16 +161,18 @@
 		const groups = findGroupElements();
 		if (!groups.length) return;
 
-		const topY = 300; // offset from viewport top
-		let active = groups[0];
+		const active = getActiveGroup(groups, OFFSET);
 
-		for (const g of groups) {
-			const r = g.el.getBoundingClientRect();
-			if (r.top - topY <= 0) active = g;
-			else break;
+		// if no active group find, return so we keep the last active one
+		if (!active) {
+			console.log('updateActiveGroup - found no active group');
+			return;
 		}
+		else console.log(`updateActiveGroup - found active group ${active.label}`);
 
-		[...buttonsContainer.children].forEach(btn => updateButtonStyle(btn, btn.textContent === active.label));
+		[...buttonsContainer.children].forEach(btn =>
+			btn.classList.toggle("active", btn.textContent === active.label)
+		);
 	}
 
 	function reposition() {
