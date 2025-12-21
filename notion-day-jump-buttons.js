@@ -243,6 +243,13 @@
 		});
 	}
 
+	function observeScroll() {
+		const scroller = getScroller();
+		if (!scroller) return;
+
+		scroller.addEventListener("scroll", updateActiveButton, { passive: true });
+	}
+
 	function attach(rootEl) {
 		root = rootEl;
 		if (getComputedStyle(root).position === "static") {
@@ -257,6 +264,7 @@
 		updateButtons(); // first call
 		// updateActiveButton(); // first call
 		observeListView(); // will trigger updateButtons() if listview changes
+		observeScroll(); // will trigger updateActiveButton() if scroll
 	}
 
 	// wait once for stable root
@@ -272,7 +280,9 @@
 
 	window.addEventListener("resize", updateContainerPosition);
 	window.addEventListener("scroll", updateContainerPosition, true);
-	window.addEventListener("scroll", updateActiveButton, true);
+	
+	// window.addEventListener("scroll", updateActiveButton, true);
+
 	// window.addEventListener("popstate", refreshStyle);
 	// window.addEventListener("visibilitychange", refreshStyle);
 
