@@ -130,6 +130,31 @@
 	//   }
 	// }
 
+	function updateActiveGroup() {
+		if (!buttonsContainer) return;
+
+		const groups = findGroupElements();
+		if (!groups.length) return;
+
+		const topY = 300; // offset from viewport top
+		let active = groups[0];
+
+		for (const g of groups) {
+			const r = g.el.getBoundingClientRect();
+			if (r.top - topY <= 0) active = g;
+			else break;
+		}
+
+		[...buttonsContainer.children].forEach(btn => {
+			btn.style.background =
+				btn.textContent === active.label
+					? "rgb(35,131,226)"
+					: "rgb(244,245,247)";
+			btn.style.color =
+				btn.textContent === active.label ? "#fff" : "#333";
+		});
+	}
+
 	function reposition() {
 		if (!root || !buttonsContainer) return;
 
@@ -187,6 +212,7 @@
 
 	window.addEventListener("resize", reposition);
 	window.addEventListener("scroll", reposition, true);
+	window.addEventListener("scroll", updateActiveGroup, true);
 	// window.addEventListener("popstate", refreshStyle);
 	// window.addEventListener("visibilitychange", refreshStyle);
 
