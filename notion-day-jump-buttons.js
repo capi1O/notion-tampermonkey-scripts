@@ -49,9 +49,11 @@
 			});
 		});
 
-		// 	// deduplicate (Notion sometimes nests)
-		// 	return [...new Map(groups.map(g => [g.label, g])).values()];
-		// }
+		groups.sort(
+			(a, b) =>
+				a.el.getBoundingClientRect().top -
+				b.el.getBoundingClientRect().top
+		);
 
 		return groups;
 	}
