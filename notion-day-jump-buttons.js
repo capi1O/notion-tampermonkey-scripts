@@ -40,7 +40,7 @@
 	document.head.appendChild(style);
 
 
-	const GROUP_SELECTOR = ".notion-frame .notion-collection_view-block"; 
+	const GROUP_HEADER_SELECTOR = ".notion-frame .notion-collection_view-block"; 
 	const BTNS_CONTAINER_ID = "tm-notion-day-jump-btns-container";
 	const LIST_VIEW_ROOT_SELECTOR =
 	".notion-page-content > .notion-selectable.notion-transclusion_reference-block";
@@ -54,8 +54,8 @@
 	let root = null;
 
 
-	function findGroupElements() {
-		const candidates = document.querySelectorAll(GROUP_SELECTOR);
+	function findGroups() {
+		const candidates = document.querySelectorAll(GROUP_HEADER_SELECTOR);
 
 		const groups = [];
 
@@ -79,9 +79,13 @@
 			const popup = element.querySelector('[data-popup-origin="true"] div');
 			if (!popup) return;
 
+			const main = element.closest('[style*="contain: layout"]');
+			if (!main) return;
+
 			groups.push({
-				element,
-				label: labelDiv.innerText.trim()
+				label: labelDiv.innerText.trim(),
+				header: element,
+				element: main
 			});
 		});
 
@@ -100,22 +104,36 @@
 		return document.querySelector(".notion-frame > .notion-selectable-container > .notion-scroller.vertical");
 	}
 	
-	const SCROLL_OFFSET = 25;
-
-	function scrollToGroup(element) {
+	function scrollToGroup({ header, label, element }) {
 
 		const scroller = getScroller();
 		if (!scroller) return;
 
 		const scrollerRect = scroller.getBoundingClientRect();
-		const elRect = element.getBoundingClientRect();
+		const elementRect = element.getBoundingClientRect();
 
-		const y =
-			scroller.scrollTop +
-			(elRect.top - scrollerRect.top) - SCROLL_OFFSET;
+		const currentScrollValue = scroller.scrollTop;
+		const scrollViewTopFromViewport = scrollerRect.top;
+		const nextGroupTopFromViewport = elementRect.top;
+
+
+		const nextGroupTopFromScrollView = nextGroupTopFromViewport - scrollViewTopFromViewport;
+		// const goingup = (nextGroupTopFromScrollView < 0) ? true : false;
+
+		const nextScrollValue = currentScrollValue + nextGroupTopFromScrollView;
+
+// 		console.log(
+// `%c
+// scrolling ${goingup ? 'up' : 'down'} to group ${label}\n
+// current scroll value: ${currentScrollValue}\n
+// scroll view position from top of VP: ${scrollViewTopFromViewport}\n
+// next group position from top of VP: ${nextGroupTopFromViewport}\n
+// next group position from top of scroll view: ${nextGroupTopFromScrollView}\n
+// next scroll value ${nextScrollValue}\n
+// `, "color:#3b82f6");
 
 		scroller.scrollTo({
-			top: y,
+			top: nextScrollValue,
 			behavior: "smooth"
 		});
 
@@ -144,27 +162,27 @@
 		// console.log(`updateButtons - existingLabels`, existingLabels);
 		// [...buttonsContainer.children].forEach(btn => console.log(btn.label));
 
-		const groupElements = findGroupElements();
-		if (!groupElements.length) {
+		const groups = findGroups();
+		if (!groups.length) {
 			// console.log('updateButtons - found no group');
 			return;
 		}
 		// else console.log(`updateButtons - found ${groupElements.length} groups`); 
 
-		groupElements.forEach(({ label, element }) => {
+		groups.forEach(({ label, element, header }) => {
 			
 			// create button if it does not already exists
 			if (!existingLabels.includes(label)) {
 				const btn = document.createElement("button");
 				btn.textContent = label;
 				btn.classList.add('tm-notion-day-jump-btn');
-				btn.onclick = (event) => scrollToGroup(element);
+				btn.onclick = (event) => scrollToGroup({ element, header, label });
 				buttonsContainer.appendChild(btn);
 			}
 		});
 	}
 
-	const VISIBILITY_OFFSET = 90;
+	const VISIBILITY_OFFSET = 90; // height of top header .notion-topbar
 
 	let lastActiveGroup = null;
 	function getActiveGroup(groups) {
@@ -172,7 +190,7 @@
 		let activeGroup;
 
 		for (const g of groups) {
-			const top = g.element.getBoundingClientRect().top;
+			const top = g.element.getBoundingClientRect().top; // top relative to viewport
 			if (top - VISIBILITY_OFFSET <= 0) activeGroup = g;
 			else break;
 		}
@@ -195,7 +213,7 @@
 			console.log('updateActiveButton - found no buttons container');
 			return;
 		}
-		const groups = findGroupElements();
+		const groups = findGroups();
 		if (!groups.length) {
 			console.log('updateActiveButton - found no groups');
 			return;
@@ -256,7 +274,7 @@
 		let stableTimer = null;
 
 		const obs = new MutationObserver(() => {
-			const groups = findGroupElements();
+			const groups = findGroups();
 			if (!groups.length) return;
 
 			const totalHeight = groups.reduce(
