@@ -15,7 +15,7 @@
 			left: 12px;
 			display: flex;
 			flex-direction: column;
-			align-items: flex-start;
+			align-items: stretch;
 			gap: 6px;
 			z-index: 9999;
 			width: max-content;
@@ -28,7 +28,7 @@
 			background: rgb(244,245,247);
 			cursor: pointer;
 			font-size: 13px;
-			text-align: left;
+			text-align: center;
 			color: #333;
 		}
 
@@ -151,13 +151,26 @@
 		return buttonsContainer;
 	}
 
+	function formatLabel(raw) {
+		const d = new Date(raw);
+		if (isNaN(d)) return raw;
+
+		return new Intl.DateTimeFormat("fr-FR", {
+			weekday: "long",
+			day: "numeric"
+		})
+			.format(d)
+			.replace(/^\w/, c => c.toUpperCase());
+	}
+
+
 	// add or update day buttons
 	function updateButtons() {
 
 		// reset to empty
 		// buttonsContainer.innerHTML = "";
 		// get existing buttons
-		const existingLabels = [...buttonsContainer.children].map(btn => btn.textContent);
+		const existingLabels = [...buttonsContainer.children].map(btn => btn.value);
 		// console.log(`updateButtons - existingLabels: ${existingLabels.join(' ')}`);
 		// console.log(`updateButtons - existingLabels`, existingLabels);
 		// [...buttonsContainer.children].forEach(btn => console.log(btn.label));
@@ -174,7 +187,8 @@
 			// create button if it does not already exists
 			if (!existingLabels.includes(label)) {
 				const btn = document.createElement("button");
-				btn.textContent = label;
+				btn.value = label;
+				btn.textContent = formatLabel(label);
 				btn.classList.add('tm-notion-day-jump-btn');
 				btn.onclick = (event) => scrollToGroup({ element, header, label });
 				buttonsContainer.appendChild(btn);
@@ -229,7 +243,7 @@
 		else console.log(`updateActiveButton - found active group ${active.label}`);
 
 		[...buttonsContainer.children].forEach(btn =>
-			btn.classList.toggle("active", btn.textContent === active.label)
+			btn.classList.toggle("active", btn.value === active.label)
 		);
 	}
 
