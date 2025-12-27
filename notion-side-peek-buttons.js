@@ -4,17 +4,40 @@
 // ==/UserScript==
 
 (() => {
+	// CSS styling
+	const style = document.createElement('style');
+	style.textContent = `
+
+		.tm-notion-side-peek-btn {
+			padding: 6px 10px;
+			border-radius: 6px;
+			border: none;
+			background: rgb(244,245,247);
+			cursor: pointer;
+			font-size: 13px;
+			text-align: center;
+			color: #333;
+		}
+
+		.tm-notion-side-peek-btn > span {
+			font-size: 13px !important;
+		}
+
+
+		.tm-notion-side-peek-btn.active {
+			background: rgb(35,131,226);
+			color: #fff;
+		}
+	`;
+	document.head.appendChild(style);
+
+
 	const BLOCK_ID = "27a9f56f-f579-41f8-83ea-5147c7f99bb5";
 	const PAGE_P_PARAM = "27a9f56ff57941f883ea5147c7f99bb5";
 	const BTN_ID = "tm-notion-sidepeek-backlog-btn";
 
-	// buttons are added to root element (.notion-frame) and manuallyy positionned relatively to target because it is not possible to add them directly to target (blocked by Notion)
-	const STABLE_ROOT_SELECTOR = ".notion-frame";
-	const TARGET_SELECTOR =
-		".notion-frame > .notion-selectable-container > .notion-scroller.vertical > div > .layout > .layout-content";
-
-	let btn = null;
-	let root = null;
+	const NOTION_TOPBAR_SELECTOR = ".notion-topbar";
+	const NOTION_TOPBAR_BREADCRUMB_SELECTOR = ".notion-topbar .shadow-cursor-breadcrumb";
 
 	function isSidePeekOpen() {
 		return location.search.includes(`p=${PAGE_P_PARAM}`);
@@ -25,6 +48,8 @@
 		a?.dispatchEvent(new MouseEvent("click", { altKey: true, bubbles: true }));
 	}
 
+	let btn = null;
+
 	function makeButton() {
 		if (btn) return btn;
 
@@ -34,20 +59,7 @@
 			<span style="font-size:18px;">🗄️</span>
 			<span style="font-size:16px;font-weight:600;margin-left:8px;">Backlog</span>
 		`;
-
-		Object.assign(btn.style, {
-			position: "absolute",
-			top: "12px",
-			padding: "8px 12px",
-			borderRadius: "8px",
-			border: "none",
-			display: "inline-flex",
-			alignItems: "center",
-			cursor: "pointer",
-			boxShadow: "0 1px 3px rgba(0,0,0,.15)",
-			transition: "background .15s, color .15s, transform .08s",
-			zIndex: 9999
-		});
+		btn.classList.add('tm-notion-side-peek-btn');
 
 		btn.onclick = openSidePeek;
 		btn.onmouseenter = () => (btn.style.transform = "translateY(-1px)");
@@ -58,60 +70,41 @@
 
 	function refreshStyle() {
 		if (!btn) return;
-		if (isSidePeekOpen()) {
-			btn.style.background = "rgb(35,131,226)";
-			btn.style.color = "#fff";
-		} else {
-			btn.style.background = "rgb(244,245,247)";
-			btn.style.color = "#333";
-		}
+
+		btn.classList.toggle("active", isSidePeekOpen())
 	}
 
-	function reposition() {
-		if (!root || !btn) return;
 
-		const target = document.querySelector(TARGET_SELECTOR);
-		if (!target) return;
-
-		const r = target.getBoundingClientRect();
-		const rr = root.getBoundingClientRect();
-		btn.style.right = `${rr.right - r.right + 8}px`;
-	}
-
-	function attach(rootEl) {
-		root = rootEl;
-		if (getComputedStyle(root).position === "static") {
-			root.style.position = "relative";
+	// TODO: reuse
+	function attach(topbar, breadcrumb) {
+		if (getComputedStyle(topbar).position === "static") {
+			topbar.style.position = "relative";
 		}
 
 		const b = makeButton();
-		if (!root.contains(b)) root.appendChild(b);
-
-		refreshStyle();
-		reposition();
+		if (!topbar.contains(b)) {
+			breadcrumb.after(b);
+		}
 	}
 
-	// wait once for stable root
+	// TODO: reuse
 	const attachObserver = new MutationObserver(() => {
-		const r = document.querySelector(STABLE_ROOT_SELECTOR);
-		if (r) {
-			attachObserver.disconnect();
-			attach(r);
+		const topbar = document.querySelector(NOTION_TOPBAR_SELECTOR);
+		if (topbar) {
+				const breadcrumb = topbar.querySelector(NOTION_TOPBAR_BREADCRUMB_SELECTOR);
+				if (breadcrumb) {
+					attachObserver.disconnect();
+					// console.log('topbar and breadcrumb found, attaching');
+					attach(topbar, breadcrumb);
+				}
+				// else console.log('breadcrumb not found');
+
 		}
+		// else  console.log('topbar not found');
 	});
 
 	attachObserver.observe(document.body, { childList: true, subtree: true });
 
-	// reactive updates (read-only)
-	const reactiveObserver = new MutationObserver(() => {
-		refreshStyle();
-		reposition();
-	});
-
-	reactiveObserver.observe(document.body, { childList: true, subtree: true });
-
-	window.addEventListener("resize", reposition);
-	window.addEventListener("scroll", reposition, true);
 	window.addEventListener("popstate", refreshStyle);
 	window.addEventListener("visibilitychange", refreshStyle);
 })();
