@@ -222,12 +222,12 @@
 
 	function updateActiveButton() {
 		if (!buttonsContainer) {
-			console.log('updateActiveButton - found no buttons container');
+			// console.log('updateActiveButton - found no buttons container');
 			return;
 		}
 		const groups = findGroups();
 		if (!groups.length) {
-			console.log('updateActiveButton - found no groups');
+			// console.log('updateActiveButton - found no groups');
 			return;
 		}
 
@@ -235,10 +235,10 @@
 
 		// if no active group returned it means it has not changed, return so we don't update unnecessarily
 		if (!active) {
-			console.log('updateActiveButton - found no active group');
+			// console.log('updateActiveButton - found no active group');
 			return;
 		}
-		else console.log(`updateActiveButton - found active group ${active.label}`);
+		// else console.log(`updateActiveButton - found active group ${active.label}`);
 
 		[...buttonsContainer.children].forEach(btn =>
 			btn.classList.toggle("active", btn.value === active.label)
@@ -346,7 +346,7 @@
 					// else console.log('no buttons found in breadcrumb');
 
 				}
-				else console.log('breadcrumb not found');
+				// else console.log('breadcrumb not found');
 
 				// wait for flexible space to appear then hide it
 				hideFlexibleSpace(topbar);
@@ -388,13 +388,13 @@
 						const isFlex = /flex-grow\s*:\s*1/.test(s) && /flex-shrink\s*:\s*1/.test(s);
 
 						if (isFlex) {// && followedByActionButtons
-							console.log('found flexible space')
+							// console.log('found flexible space')
 							flexSpaceObserver.disconnect();
 							div.classList.add("tm-notion-hide");
 						}
 					});
 			}
-			else console.log('found no potential flexible space')
+			// else console.log('found no potential flexible space')
 		});
 		flexSpaceObserver.observe(topbar, { childList: true, subtree: true });
 	}
