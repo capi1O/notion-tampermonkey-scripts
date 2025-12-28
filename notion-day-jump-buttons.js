@@ -382,8 +382,10 @@
 				potentialFlexibleSpace
 					.forEach(div => {
 						const followedByActionButtons = div.nextElementSibling?.classList.contains('notion-topbar-action-buttons');
-						const style = getComputedStyle(div);
-						const isFlex = style.flexGrow === '1' && style.flexShrink === '1';
+						// const style = getComputedStyle(div);
+						// const isFlex = style.flexGrow === '1' && style.flexShrink === '1';
+						const s = div.getAttribute('style') || '';
+						const isFlex = /flex-grow\s*:\s*1/.test(s) && /flex-shrink\s*:\s*1/.test(s);
 
 						if (isFlex) {// && followedByActionButtons
 							console.log('found flexible space')
