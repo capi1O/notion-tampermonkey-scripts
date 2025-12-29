@@ -14,7 +14,7 @@
 			display: flex;
 			flex-direction: row;
 			align-items: center;
-			justify-content: flex-end;
+			justify-content: flex-start;
 			gap: 6px;
 			width: max-content;
 			white-space: nowrap;
@@ -35,21 +35,15 @@
 			background: rgb(35,131,226);
 			color: #fff;
 		}
-
-		.tm-notion-hide, .notion-topbar-share-menu, .notion-topbar-favorite-button {
-			display: none !important;
-		}
 	`;
 	document.head.appendChild(style);
 
 
-	const GROUP_HEADER_SELECTOR = ".notion-frame .notion-collection_view-block"; 
+	const GROUP_HEADER_SELECTOR = ".notion-frame .notion-collection_view-block";
+	const TOP_BAR_BTNS_CONTAINER_ID = "tm-notion-top-bar-btns-container"; // TODO: reuse
 	const BTNS_CONTAINER_ID = "tm-notion-day-jump-btns-container";
 	const LIST_VIEW_ROOT_SELECTOR =
 	".notion-page-content > .notion-selectable.notion-transclusion_reference-block";
-
-	const NOTION_TOPBAR_SELECTOR = ".notion-topbar";
-	const NOTION_BREADCRUMB_SELECTOR = ".shadow-cursor-breadcrumb";
 
 	function findGroups() {
 		const candidates = document.querySelectorAll(GROUP_HEADER_SELECTOR);
@@ -311,14 +305,13 @@
 	// }
 
 
-	function attach(topbar, breadcrumb) {
-		if (getComputedStyle(topbar).position === "static") {
-			topbar.style.position = "relative";
-		}
+	function attach(topBarButtonsContainer) {
 
 		const b = buildButtonsContainer();
-		if (!topbar.contains(b)) {
-			breadcrumb.after(b);
+		if (!topBarButtonsContainer.contains(b)) {
+			// insert buttons container as first child
+			// topBarButtonsContainer.prepend(b);
+			topBarButtonsContainer.insertBefore(b, topBarButtonsContainer.firstChild);
 		}
 
 		observeListView(); // will trigger updateButtons() if listview changes
@@ -333,84 +326,15 @@
 
 	// TODO: reuse
 	const attachObserver = new MutationObserver(() => {
-		const topbar = document.querySelector(NOTION_TOPBAR_SELECTOR);
-		if (topbar) {
-				const breadcrumb = topbar.querySelector(NOTION_BREADCRUMB_SELECTOR);
-				if (breadcrumb) {
-					attachObserver.disconnect();
-					// console.log('topbar and breadcrumb found, attaching');
-					attach(topbar, breadcrumb);
-
-					const breadcrumbButtons = [...breadcrumb.querySelectorAll("div[role='button']")];
-					if (breadcrumbButtons.length > 0) hidePageLocationButton(breadcrumbButtons);
-					// else console.log('no buttons found in breadcrumb');
-
-				}
-				// else console.log('breadcrumb not found');
-
-				// wait for flexible space to appear then hide it
-				hideFlexibleSpace(topbar);
-
+		const topBarButtonsContainer = document.getElementById(TOP_BAR_BTNS_CONTAINER_ID);
+		if (topBarButtonsContainer) {
+			// console.log('topbar and breadcrumb found, attaching');
+			attach(topBarButtonsContainer);
 		}
 		// else  console.log('topbar not found');
 	});
 	
 	attachObserver.observe(document.body, { childList: true, subtree: true });
 
-	
-	// hide page location ("Private") button (cannot in CSS only)
-	function hidePageLocationButton(breadcrumbButtons) {
-		// console.log(`hidePageLocationButton, found ${breadcrumbButtons.length} buttons`);
-		breadcrumbButtons.forEach(btn => {
-			if (btn.innerText?.trim() === "Private") {
-				btn.classList.add("tm-notion-hide");
-			}
-		});
-	}
-
-		// hide top bar "flex" div (cannot in CSS only)
-	function hideFlexibleSpace(topbar) {
-		// console.log('hideFlexibleSpace')
-		const flexSpaceObserver = new MutationObserver(() => {
-			const potentialFlexibleSpace = [...topbar.querySelectorAll('.notion-selectable-container > div > div')]
-			// const potentialFlexibleSpace = topbar.querySelector('.notion-selectable-container > div > div [style*="flex-grow: 1"][style*="flex-shrink: 1"]')
-
-			if (potentialFlexibleSpace.length > 0) {
-				// console.log(`found ${potentialFlexibleSpace.length} potential flexible space`);
-
-				// const flexibleSpace = potentialFlexibleSpace
-				potentialFlexibleSpace
-					.forEach(div => {
-						const followedByActionButtons = div.nextElementSibling?.classList.contains('notion-topbar-action-buttons');
-						// const style = getComputedStyle(div);
-						// const isFlex = style.flexGrow === '1' && style.flexShrink === '1';
-						const s = div.getAttribute('style') || '';
-						const isFlex = /flex-grow\s*:\s*1/.test(s) && /flex-shrink\s*:\s*1/.test(s);
-
-						if (isFlex) {// && followedByActionButtons
-							// console.log('found flexible space')
-							flexSpaceObserver.disconnect();
-							div.classList.add("tm-notion-hide");
-						}
-					});
-			}
-			// else console.log('found no potential flexible space')
-		});
-		flexSpaceObserver.observe(topbar, { childList: true, subtree: true });
-	}
-
-	// const breadcrumbObserver = new MutationObserver(() => {
-	// 	const breadcrumb = document.querySelector(NOTION_TOPBAR_BREADCRUMB_SELECTOR);
-	// 	if (breadcrumb) {
-	// 		console.log('breadcrumb found');
-	// 		hideTopBarButtons(breadcrumb);
-	// 	}
-	// 	else console.log('breadcrumb not found');
-	// });
-
-	// breadcrumbObserver.observe(breadcrumb, {
-	// 	childList: true,
-	// 	subtree: true
-	// });
 
 })();
