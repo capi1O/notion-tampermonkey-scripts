@@ -8,13 +8,14 @@
 	const style = document.createElement('style');
 	style.textContent = `
 
-			.tm-notion-top-bar-btns-container {
-				display: flex;
-				flex-direction: row;
-				align-items: center;
-				justify-content: space-between;
-				white-space: nowrap;
-				flex-grow: 1;
+		.tm-notion-top-bar-btns-container {
+			position: absolute;
+			top: 0px;
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: space-between;
+			flex-wrap: nowrap;
 		}
 
 		.tm-notion-side-peek-btns-container {
@@ -65,6 +66,10 @@
 
 	const NOTION_TOPBAR_SELECTOR = ".notion-topbar";
 	const NOTION_BREADCRUMB_SELECTOR = ".shadow-cursor-breadcrumb";
+
+	// buttons container is added to top bar (.notion-frame) and manually styled to match target width
+	const TARGET_SELECTOR =
+	".notion-frame > .notion-selectable-container > .notion-scroller.vertical > div > .layout > .layout-content";
 
 	function isSidePeekOpen() {
 		return location.search.includes(`p=${PAGE_P_PARAM}`);
@@ -140,6 +145,7 @@
 					attachObserver.disconnect();
 					// console.log('topbar and breadcrumb found, attaching');
 					attach(topbar, breadcrumb);
+					repositionButtonsContainer();
 					buildBacklogButton();
 				}
 				// else console.log('breadcrumb not found');
@@ -155,6 +161,28 @@
 	window.addEventListener("popstate", refreshBacklogButtonStyle);
 	window.addEventListener("visibilitychange", refreshBacklogButtonStyle);
 
+	function repositionButtonsContainer() {
+		if (!topBarButtonsContainer) return;
+
+		const target = document.querySelector(TARGET_SELECTOR);
+		if (!target) return;
+
+		const targetRect = target.getBoundingClientRect();
+		console.log('layout content rect:', targetRect);
+		topBarButtonsContainer.style.left = `${targetRect.left}px`;
+		topBarButtonsContainer.style.width = `${targetRect.width - 2}px`;
+	}
+
+	window.addEventListener("resize", repositionButtonsContainer);
+	window.addEventListener("scroll", repositionButtonsContainer, true);
+
+		// reactive updates (read-only)
+		const reactiveObserver = new MutationObserver(() => {
+			refreshBacklogButtonStyle();
+			repositionButtonsContainer();
+		});
+
+		reactiveObserver.observe(document.body, { childList: true, subtree: true });
 
 	// hide top bar "flex" div (cannot in CSS only)
 	function hideFlexibleSpace(topbar) {
