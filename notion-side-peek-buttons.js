@@ -155,7 +155,7 @@
 		repositionTopBarButtonsContainer();
 		refreshSidePeekButtonsContainerStyle();
 		// refreshBacklogButtonStyle();
-		moveBacklogLink();
+		moveBacklogLink(); // not really read-only but required dto move button on load
 		refreshBacklogLinkStyle();
 	});
 
@@ -255,11 +255,9 @@
 	// window.addEventListener("visibilitychange", refreshBacklogButtonStyle);
 
 	// Move real notion backlog link/button in side peek container
-	let backlogLink = null;
+	// let backlogLink = null;
 	function moveBacklogLink() {
-
-		backlogLink = document.querySelector(`[data-block-id="${BACKLOG_LINK_BLOCK_ID}"] a`);
-
+		const backlogLink = document.querySelector(`[data-block-id="${BACKLOG_LINK_BLOCK_ID}"] a`);
 		if (!backlogLink || !sidePeekButtonsContainer) return;
 		sidePeekButtonsContainer.appendChild(backlogLink);
 	}
@@ -267,12 +265,22 @@
 	window.addEventListener("scroll", moveBacklogLink, true);
 
 	function refreshBacklogLinkStyle() {
-		if (!backlogLink) return;
 
+		if (!sidePeekButtonsContainer) return;
+
+		const	backlogLink = sidePeekButtonsContainer.querySelector('a');
+		if (!backlogLink) {
+			console.log('refreshBacklogLinkStyle, link not found');
+			return;
+		}
+		console.log('refreshBacklogLinkStyle, link found');
 		backlogLink.classList.toggle("active", isBacklogOpenInSidePeek())
 	}
 
-	function onUrlChange(cb) {
+	onUrlChange(refreshBacklogLinkStyle);
+	window.addEventListener("visibilitychange", refreshBacklogLinkStyle);
+
+		function onUrlChange(cb) {
 		const _push = history.pushState;
 		const _replace = history.replaceState;
 
@@ -288,8 +296,5 @@
 
 		window.addEventListener("popstate", cb);
 	}
-
-	onUrlChange(refreshBacklogLinkStyle);
-	window.addEventListener("visibilitychange", refreshBacklogLinkStyle);
 
 })();
