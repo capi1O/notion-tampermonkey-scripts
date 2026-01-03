@@ -58,6 +58,10 @@
 		.tm-notion-hide, .shadow-cursor-breadcrumb, .notion-topbar-share-menu, .notion-topbar-favorite-button {
 			display: none !important;
 		}
+
+		#tm-notion-sidepeek-backlog-btn {
+		pointer-events: none;
+		}
 	`;
 	document.head.appendChild(style);
 
@@ -107,6 +111,8 @@
 					repositionTopBarButtonsContainer();
 					buildSidePeekButtonsContainer();
 					buildBacklogButton();
+					// repositionBacklogLink();
+					moveBacklogLink();
 				}
 				// else console.log('breadcrumb not found');
 
@@ -136,7 +142,7 @@
 
 	// reactive updates (read-only)
 	const reactiveObserver = new MutationObserver(() => {
-		refreshBacklogButtonStyle();
+		// refreshBacklogButtonStyle();
 		repositionTopBarButtonsContainer();
 	});
 
@@ -175,7 +181,6 @@
 
 
 	// SIDE PEEK BUTTONS
-	const PAGE_P_PARAM = "27a9f56ff57941f883ea5147c7f99bb5";
 	const SIDE_PEEK_BTNS_CONTAINER_ID = "tm-notion-side-peek-btns-container";
 
 	let sidePeekButtonsContainer = null;
@@ -195,116 +200,63 @@
 
 
 	// BACKLOG BUTTON
-	const BACKLOG_BUTTON_BLOCK_ID = "27a9f56f-f579-41f8-83ea-5147c7f99bb5";
-	const BACKLOG_BTN_ID = "tm-notion-sidepeek-backlog-btn";
+	const BACKLOG_LINK_BLOCK_ID = "27a9f56f-f579-41f8-83ea-5147c7f99bb5";
+	// const BACKLOG_BTN_ID = "tm-notion-sidepeek-backlog-btn";
+	const PAGE_P_PARAM = "27a9f56ff57941f883ea5147c7f99bb5";
 	function isBacklogOpenInSidePeek() {
 		return location.search.includes(`p=${PAGE_P_PARAM}`);
 	}
 
-	let backlogButton = null;
-	function buildBacklogButton() {
-		if (backlogButton) return backlogButton;
+	// let backlogButton = null;
+	// function buildBacklogButton() {
+	// 	if (backlogButton) return backlogButton;
 
-		backlogButton = document.createElement("button");
-		backlogButton.id = BACKLOG_BTN_ID;
-		backlogButton.innerHTML = `
-			<span style="font-size:18px;">🗄️</span>
-			<span style="font-size:16px;font-weight:600;margin-left:8px;">Backlog</span>
-		`;
-		backlogButton.classList.add('tm-notion-side-peek-btn');
+	// 	backlogButton = document.createElement("button");
+	// 	backlogButton.id = BACKLOG_BTN_ID;
+	// 	backlogButton.innerHTML = `
+	// 		<span style="font-size:18px;">🗄️</span>
+	// 		<span style="font-size:16px;font-weight:600;margin-left:8px;">Backlog</span>
+	// 	`;
+	// 	backlogButton.classList.add('tm-notion-side-peek-btn');
 
-		backlogButton.onclick = openBacklogInSidePeek;
-		backlogButton.onmouseenter = () => (backlogButton.style.transform = "translateY(-1px)");
-		backlogButton.onmouseleave = () => (backlogButton.style.transform = "translateY(0)");
+	// 	// backlogButton.onclick = openBacklogInSidePeek;
+	// 	// backlogButton.onmouseenter = () => (backlogButton.style.transform = "translateY(-1px)");
+	// 	// backlogButton.onmouseleave = () => (backlogButton.style.transform = "translateY(0)");
 
-		sidePeekButtonsContainer.appendChild(backlogButton);
+	// 	sidePeekButtonsContainer.appendChild(backlogButton);
+	// }
+
+	// function refreshBacklogButtonStyle() {
+	// 	if (!backlogButton) return;
+
+	// 	backlogButton.classList.toggle("active", isBacklogOpenInSidePeek())
+	// }
+	// window.addEventListener("popstate", refreshBacklogButtonStyle);
+	// window.addEventListener("visibilitychange", refreshBacklogButtonStyle);
+
+	// Place real notion backlog link/button in side peek container
+	// function repositionBacklogLink() {
+
+	// 	const backlogLink = document.querySelector(`[data-block-id="${BACKLOG_LINK_BLOCK_ID}"] a`);
+		
+	// 	if (!backlogLink || !backlogButton) return;
+	// 	const targetRect = backlogButton.getBoundingClientRect();
+	// 	backlogLink.style.position = 'absolute';
+	// 	backlogLink.style.top = `${targetRect.top}px`;
+	// 	backlogLink.style.left = `${targetRect.left}px`;
+	// 	backlogLink.style.width = `${targetRect.width}px`;
+	// }
+	// window.addEventListener("resize", repositionBacklogLink);
+	// window.addEventListener("scroll", repositionBacklogLink, true);
+
+	// Move real notion backlog link/button in side peek container
+	function moveBacklogLink() {
+
+		const backlogLink = document.querySelector(`[data-block-id="${BACKLOG_LINK_BLOCK_ID}"] a`);
+
+		if (!backlogLink || !sidePeekButtonsContainer) return;
+		sidePeekButtonsContainer.appendChild(backlogLink);
 	}
-
-	function refreshBacklogButtonStyle() {
-		if (!backlogButton) return;
-
-		backlogButton.classList.toggle("active", isBacklogOpenInSidePeek())
-	}
-
-	window.addEventListener("popstate", refreshBacklogButtonStyle);
-	window.addEventListener("visibilitychange", refreshBacklogButtonStyle);
-
-	function openBacklogInSidePeek() {
-
-		if (isSidePeekOpen()) {
-
-			const a = document.querySelector(`[data-block-id="${BACKLOG_BUTTON_BLOCK_ID}"] a`);
-			if (a) {
-
-				// Method 1: simulate alt click
-				// a.dispatchEvent(new MouseEvent("click", { altKey: true, bubbles: true }));
-
-				// Method 2: simulate alt click v2
-				// const opts = {
-				// 	bubbles: true,
-				// 	cancelable: true,
-				// 	altKey: true,
-				// 	button: 0,
-				// 	buttons: 1
-				// };
-				// a.dispatchEvent(new PointerEvent("pointerdown", opts));
-				// a.dispatchEvent(new MouseEvent("mousedown", opts));
-				// a.dispatchEvent(new MouseEvent("mouseup", opts));
-				// a.dispatchEvent(new MouseEvent("click", opts));
-
-
-				// Method 3: simulate Alt key down, click then Alt key up
-				// window.dispatchEvent(
-				// 	new KeyboardEvent("keydown", {
-				// 		key: "Alt",
-				// 		altKey: true,
-				// 		bubbles: true
-				// 	})
-				// );
-				// a.click();
-				// window.dispatchEvent(
-				// 	new KeyboardEvent("keyup", {
-				// 		key: "Alt",
-				// 		bubbles: true
-				// 	})
-				// );
-
-				// Method 4: Create a temporary link element with Alt key to trigger side peek
-				// 	const a = document.createElement('a');
-				// 	a.href = 'https://www.notion.so/cap1o/Planning-0d0b47fba5e647f6b89a7d6967e93c3a?p=27a9f56ff57941f883ea5147c7f99bb5&pm=s';
-				// 	a.style.display = 'none';
-				// 	document.body.appendChild(a);
-				// 	const evt = new MouseEvent('click', {
-				// 			bubbles: true,
-				// 			cancelable: true,
-				// 			altKey: true   // Alt triggers Side Peek
-				// 	});
-				// 	a.dispatchEvent(evt);
-				// 	document.body.removeChild(a);
-
-				// Method 5: change URL
-				// const url = new URL(location.href); //new URL(window.location);
-				// url.searchParams.set('p', '27a9f56ff57941f883ea5147c7f99bb5');
-				// url.searchParams.set('pm', 's');
-				// history.pushState(null, '', url); // changes URL without reload
-				// trigger some Notion JS function:
-				// window.dispatchEvent(new Event('popstate'));
-			}
-			else console.log('backlog button not found')
-		}
-		else openSidePeek();
-
-
-		// if (isSidePeekOpen()) {
-		// 	console.log('close side peek');
-
-		// 	// simulate Esc key press
-		// 	const escEvent = new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', bubbles: true });
-		// 	document.dispatchEvent(escEvent);
-		// }
-		// else {
-		// 	console.log('open side peek');
-
-		// }
-	}
+	window.addEventListener("resize", moveBacklogLink);
+	window.addEventListener("scroll", moveBacklogLink, true);
 })();
