@@ -5,11 +5,19 @@
 
 (() => {
 
+	const GROUP_HEADER_SELECTOR = ".notion-frame .notion-collection_view-block";
+	const TOP_BAR_BTNS_CONTAINER_ID = "tm-notion-top-bar-btns-container"; // TODO: get from notion-side-peek-buttons.js
+	const BTNS_CONTAINER_ID = "tm-notion-day-jump-btns-container";
+	const BTNS_CONTAINER_WRAPPER_ID = "tm-notion-day-jump-btns-wrapper";
+	const DAY_JUMP_BUTTON_CLASS = "tm-notion-day-jump-btn";
+	const LIST_VIEW_ROOT_SELECTOR =
+	".notion-page-content > .notion-selectable.notion-transclusion_reference-block";
+
 	// CSS styling
 	const style = document.createElement('style');
 	style.textContent = `
 
-		.tm-notion-day-jump-btns-container {
+		#${BTNS_CONTAINER_ID} {
 			overflow: hidden;
 			min-width: 0;
 			flex-grow: 0;
@@ -17,7 +25,7 @@
 			flex-basis: auto;
 		}
 
-		.tm-notion-day-jump-btns-wrapper {
+		#${BTNS_CONTAINER_WRAPPER_ID} {
 			display: flex;
 			flex-direction: row;
 			align-items: center;
@@ -26,7 +34,7 @@
 			flex-wrap: nowrap;
 		}
 
-		.tm-notion-day-jump-btn {
+		.${DAY_JUMP_BUTTON_CLASS} {
 			padding: 6px 10px;
 			border-radius: 20px;
 			border: none;
@@ -38,19 +46,13 @@
 			white-space: nowrap;
 		}
 
-		.tm-notion-day-jump-btn.active {
+		.${DAY_JUMP_BUTTON_CLASS}.active {
 			background: rgb(35,131,226);
 			color: #fff;
 		}
 	`;
 	document.head.appendChild(style);
 
-
-	const GROUP_HEADER_SELECTOR = ".notion-frame .notion-collection_view-block";
-	const TOP_BAR_BTNS_CONTAINER_ID = "tm-notion-top-bar-btns-container"; // TODO: reuse
-	const BTNS_CONTAINER_ID = "tm-notion-day-jump-btns-container";
-	const LIST_VIEW_ROOT_SELECTOR =
-	".notion-page-content > .notion-selectable.notion-transclusion_reference-block";
 
 	function findGroups() {
 		const candidates = document.querySelectorAll(GROUP_HEADER_SELECTOR);
@@ -145,10 +147,9 @@
 
 		buttonsContainer = document.createElement("div");
 		buttonsContainer.id = BTNS_CONTAINER_ID;
-		buttonsContainer.classList.add('tm-notion-day-jump-btns-container');
 
 		buttonsContainerWrapper = document.createElement("div");
-		buttonsContainerWrapper.classList.add('tm-notion-day-jump-btns-wrapper');
+		buttonsContainerWrapper.id = BTNS_CONTAINER_WRAPPER_ID;
 		buttonsContainer.appendChild(buttonsContainerWrapper);
 
 		return buttonsContainer;
@@ -192,7 +193,7 @@
 				const btn = document.createElement("button");
 				btn.value = label;
 				btn.textContent = formatLabel(label);
-				btn.classList.add('tm-notion-day-jump-btn');
+				btn.classList.add(DAY_JUMP_BUTTON_CLASS);
 				btn.onclick = (event) => scrollToGroup({ element, header, label });
 				buttonsContainer.querySelector('div').appendChild(btn);
 			}
