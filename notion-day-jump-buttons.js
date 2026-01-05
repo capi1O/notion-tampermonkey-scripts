@@ -28,7 +28,7 @@
 
 		.tm-notion-day-jump-btn {
 			padding: 6px 10px;
-			border-radius: 6px;
+			border-radius: 20px;
 			border: none;
 			background: rgb(244,245,247);
 			cursor: pointer;
