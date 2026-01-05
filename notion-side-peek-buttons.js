@@ -33,12 +33,17 @@
 			flex-shrink: 0;
 			flex-basis: auto;
 			min-width: max-content;
+			color: #333;
 			background: rgb(244,245,247);
 			border-radius: 20px;
 			border-style: solid;
 			border-color: transparent;
 			padding: 0px 5px 0px 10px; /* top right bottom left*/
 			overflow: hidden;
+		}
+		.tm-notion-side-peek-menu.active {
+			color: #fff;
+			background: rgb(35,131,226);
 		}
 
 		.tm-notion-side-peek-menu.open {
@@ -52,10 +57,16 @@
 			height: 20px;
 			display: block;
 			flex-shrink: 0;
-			fill: #333 !important;
+			fill: #333;
+		}
+		.tm-notion-side-peek-menu-side-peek-icon.active {
+			fill: rgb(35,131,226);
 		}
 		.tm-notion-side-peek-menu.active > .tm-notion-side-peek-menu-side-peek-icon {
-			fill: rgb(35,131,226) !important;
+			fill: #fff;
+		}
+		.tm-notion-side-peek-menu.active > .tm-notion-side-peek-menu-side-peek-icon.active {
+			fill: red;
 		}
 
 		/* arrow button */
@@ -72,20 +83,31 @@
 			transition: transform 200ms ease-out;
 			transform: rotateZ(0deg);
 			opacity: 1;
-			fill: #333 !important;
+			fill: #333;
 		}
 		.tm-notion-side-peek-menu.open > .tm-notion-side-peek-menu-arrow > svg,
 		.tm-notion-side-peek-menu-arrow:hover > svg {
-			fill: rgb(35,131,226) !important;
+			fill: rgb(35,131,226);
+		}
+		.tm-notion-side-peek-menu.active > .tm-notion-side-peek-menu-arrow > svg {
+			fill: #fff;
+		}
+		.tm-notion-side-peek-menu.active.open > .tm-notion-side-peek-menu-arrow > svg,
+		.tm-notion-side-peek-menu.active > .tm-notion-side-peek-menu-arrow:hover > svg {
+			fill: red;
 		}
 
 		/* link */
+		.tm-notion-side-peek-menu-active-value {
+			color: inherit;
+			background: none;
+		}
 		.tm-notion-side-peek-menu-active-value > a {
 			/* background: rgb(35,131,226); */
 			/* color: #fff !important; */
 			font-size: 13px;
-			color: #333 !important;
-			background: rgb(244,245,247);
+			color: inherit !important;
+			background: none;
 		}
 
 		/* menu values */
@@ -101,11 +123,12 @@
 			height: 0px;
 			display: flex;
 			flex-direction: column;
-			align-items: flex-start; /* x: align left */
-			justify-content: flex-start; /* y: top */
-			background: rgb(244,245,247);
+			align-items: flex-start;
+			justify-content: flex-start;
+			color: inherit;
+			background: inherit;
 			border-radius: 0px 0px 20px 20px;
-			border-style: solid;
+			border: none;
 		}
 
 		.tm-notion-side-peek-menu.open > .tm-notion-side-peek-menu-values {
@@ -115,11 +138,11 @@
 		.tm-notion-side-peek-menu-values > a {
 			border: none;
 			padding-right: 6px;
-			background: rgb(244,245,247);
 			cursor: pointer;
 			font-size: 13px;
 			text-align: center;
-			color: #333 !important;
+			color: inherit !important;
+			background: none;
 			/* border: 1px solid transparent; */
 		}
 
@@ -208,7 +231,7 @@
 		repositionTopBarButtonsContainer();
 		refreshSidePeekMenuStyle();
 		movePageLinksToMenu(); // not really read-only but required to move link on load
-		refreshPageLinksStyle();
+		refreshSidePeekStyle();
 	});
 
 	reactiveObserver.observe(document.body, { childList: true, subtree: true });
@@ -249,6 +272,7 @@
 	const SIDE_PEEK_MENU_ID = "tm-notion-side-peek-menu";
 
 	let sidePeekMenu = null;
+	let sidePeekIcon = null;
 	let activeValue = null;
 	let values = null;
 	function buildSidePeekMenu() {
@@ -257,7 +281,7 @@
 		sidePeekMenu.id = SIDE_PEEK_MENU_ID;
 		sidePeekMenu.classList.add('tm-notion-side-peek-menu');
 
-		const sidePeekIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+		sidePeekIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 
 		sidePeekIcon.setAttribute("aria-hidden", "true");
 		sidePeekIcon.setAttribute("role", "graphics-symbol");
@@ -301,6 +325,10 @@
 		return sidePeekMenu;
 	}
 
+	function getActiveLink () {
+		const activeLink = activeValue.querySelector('a');
+		return activeLink;
+	};
 
 	function onLinkClick(link, event) {
 		
@@ -308,7 +336,7 @@
 		if (!!link.closest('.active-value')) return;
 
 		// 1. get current active link
-		const oldActiveLink = activeValue.querySelector('a');
+		const oldActiveLink = getActiveLink();
 
 		// 2. move old to menu
 		if (oldActiveLink) values.appendChild(oldActiveLink);
@@ -342,11 +370,19 @@
 		boatTasks: "18cc1bfe-79a6-805c-9f38-fa6b5f790d4e",
 		appProjects: "196c1bfe-79a6-801b-afdc-f467feaf038c"
 	};
-	const pageParam = (pageId) => pageId.replace("-", "");
 
-	function isPageOpenInSidePeek(pageParam) {
-		console.log(`isPageOpenInSidePeek ${pageParam}`);
-		return location.search.includes(`p=${pageParam}`);
+	// const pageParam = (pageId) => pageId.replace("-", "");
+	function pageParam (pageId) {
+		const result = pageId.replace(/-/g, "");
+		console.log(`pageParam ${pageId} => ${result}`);
+		return result;
+	}
+
+
+	function isPageOpenInSidePeek(pgeParam) {
+		const result = location.search.includes(`p=${pgeParam}`);
+		console.log(`isPageOpenInSidePeek, param '${pgeParam}'? ${result}`);
+		return result;
 	}
 
 	// Move real notion page link/button in side peek container
@@ -365,26 +401,23 @@
 	window.addEventListener("resize", movePageLinksToMenu);
 	window.addEventListener("scroll", movePageLinksToMenu, true);
 
-	function refreshPageLinksStyle() {
+	// update side peek menu/button / active flag and side peek icon active flag
+	function refreshSidePeekStyle() {
 
-		if (!sidePeekMenu) return;
-
-		const	links = sidePeekMenu.querySelectorAll('tm-notion-side-peek-menu-values > a');
-		if (!links) {
-			console.log('refreshPageLinksStyle, links not found');
-			return;
+		if (sidePeekMenu) {
+			const activeLink = getActiveLink();
+			if (activeLink) {
+ 				sidePeekMenu.classList.toggle("active", isPageOpenInSidePeek(pageParam(activeLink.id)));
+			}
 		}
 
-		links.forEach(link => {
-			const linkId = link?.id;
-			const pageId = pageIds[linkId];
-			if (pageId) link.classList.toggle("active", isPageOpenInSidePeek(pageParam(pageId)));
-			else console.log(`refreshPageLinksStyle, found no pageId for link ${linkId}`);
-		});
+		if (sidePeekIcon) {
+			sidePeekIcon.classList.toggle("active", isSidePeekOpen());
+		}
 	}
 
-	onUrlChange(refreshPageLinksStyle);
-	window.addEventListener("visibilitychange", refreshPageLinksStyle);
+	onUrlChange(refreshSidePeekStyle);
+	window.addEventListener("visibilitychange", refreshSidePeekStyle);
 
 	function onUrlChange(cb) {
 		const _push = history.pushState;
