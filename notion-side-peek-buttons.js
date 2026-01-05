@@ -143,8 +143,10 @@
 
 
 	// SIDE PEEK MENU
+	// const SIDE_PEEK_MENU_ID = "tm-notion-side-peek-menu";
+	const SIDE_PEEK_BUTTON_ID = "tm-notion-side-peek-button";
+	const SIDE_PEEK_INDICATOR_CLASS = "tm-notion-side-peek-indicator";
 	const SIDE_PEEK_MENU_ID = "tm-notion-side-peek-menu";
-	const SIDE_PEEK_MENU_CLASS = "tm-notion-side-peek-menu";
 	const SIDE_PEEK_MENU_ARROW_CLASS = "tm-notion-side-peek-menu-arrow";
 	const SIDE_PEEK_MENU_ACTIVE_VALUE_CLASS = "tm-notion-side-peek-menu-active-value";
 	const SIDE_PEEK_MENU_VALUES_CLASS = "tm-notion-side-peek-menu-values";
@@ -152,53 +154,108 @@
 	// CSS styling
 	const sidePeekMenuStyle = document.createElement('style');
 	sidePeekMenuStyle.textContent = `
-		.${SIDE_PEEK_MENU_CLASS} {
-			position: relative;
+
+		#${SIDE_PEEK_BUTTON_ID} {
 			margin-left: 8px;
 			display: flex;
-			flex-direction: row;
-			align-items: center;
-			justify-content: flex-end;
-			gap: 6px;
+			gap: 1px;
 			flex-wrap: nowrap;
 			/* flex-grow: 1; */
 			flex-shrink: 0;
 			flex-basis: auto;
-			min-width: max-content;
+		}
+
+		/* side peek icon on the left */
+		.${SIDE_PEEK_INDICATOR_CLASS} {
+			border-radius: 20px 0px 0px 20px; /* top-left | top-right | bottom-right | bottom-left */
 			color: #333;
 			background: rgb(244,245,247);
-			border-radius: 20px;
-			border-style: solid;
-			border-color: transparent;
-			padding: 0px 5px 0px 10px; /* top right bottom left*/
-			overflow: hidden;
+			padding: 7px 5px 7px 10px; /* top | right | bottom | left*/
 		}
-		.${SIDE_PEEK_MENU_CLASS}.active {
-			color: #fff;
-			background: rgb(35,131,226);
-		}
-
-		.${SIDE_PEEK_MENU_CLASS}.open {
-			overflow: visible;
-		}
-
-
-		/* side peek icon */
-		.tm-notion-side-peek-menu-side-peek-icon {
+		.${SIDE_PEEK_INDICATOR_CLASS} > svg {
 			width: 20px;
 			height: 20px;
 			display: block;
 			flex-shrink: 0;
 			fill: #333;
 		}
-		.tm-notion-side-peek-menu-side-peek-icon.active {
-			fill: rgb(35,131,226);
+		.${SIDE_PEEK_INDICATOR_CLASS}.active {
+			color: #fff;
+			background: rgb(35,131,226);
 		}
-		.${SIDE_PEEK_MENU_CLASS}.active > .tm-notion-side-peek-menu-side-peek-icon {
+		.${SIDE_PEEK_INDICATOR_CLASS}.active > svg {
 			fill: #fff;
 		}
-		.${SIDE_PEEK_MENU_CLASS}.active > .tm-notion-side-peek-menu-side-peek-icon.active {
-			fill: red;
+
+
+
+		/* page links drop down menu */
+		#${SIDE_PEEK_MENU_ID} {
+			position: relative;
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: flex-end;
+			min-width: max-content;
+			color: #333;
+			background: rgb(244,245,247);
+			border-radius: 0px 20px 20px 0px; /* top-left | top-right | bottom-right | bottom-left */
+			padding: 0px 5px 0px 5px; /* top | right | bottom | left*/
+			overflow: hidden;
+		}
+		#${SIDE_PEEK_MENU_ID}.active {
+			color: #fff;
+			background: rgb(35,131,226);
+		}
+
+		#${SIDE_PEEK_MENU_ID}.open {
+			overflow: visible;
+		}
+
+		/* link */
+		.${SIDE_PEEK_MENU_ACTIVE_VALUE_CLASS} {
+			color: inherit;
+			background: none;
+		}
+		.${SIDE_PEEK_MENU_ACTIVE_VALUE_CLASS} > a {
+			font-size: 13px;
+			color: inherit !important;
+			background: none;
+		}
+
+		/* menu values */
+		.${SIDE_PEEK_MENU_VALUES_CLASS} {
+			position: absolute;
+			top: 15px;
+			left: 0px;
+			width: 100%;
+			padding: 20px 0px 10px 5px; /* top | right | bottom | left*/
+			overflow: hidden;
+			z-index: -1;
+			height: 0px;
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			justify-content: flex-start;
+			color: inherit;
+			background: inherit;
+			border-radius: 0px 0px 20px 20px; /* top-left | top-right | bottom-right | bottom-left */
+			border: none;
+		}
+
+		#${SIDE_PEEK_MENU_ID}.open > .${SIDE_PEEK_MENU_VALUES_CLASS} {
+			height: auto;
+		}
+
+		.${SIDE_PEEK_MENU_VALUES_CLASS} > a {
+			border: none;
+			padding-right: 6px;
+			cursor: pointer;
+			font-size: 13px;
+			text-align: center;
+			color: inherit !important;
+			background: none;
+			/* border: 1px solid transparent; */
 		}
 
 		/* arrow button */
@@ -217,92 +274,49 @@
 			opacity: 1;
 			fill: #333;
 		}
-		.${SIDE_PEEK_MENU_CLASS}.open > .${SIDE_PEEK_MENU_ARROW_CLASS} > svg,
+		#${SIDE_PEEK_MENU_ID}.open > .${SIDE_PEEK_MENU_ARROW_CLASS} > svg,
 		.${SIDE_PEEK_MENU_ARROW_CLASS}:hover > svg {
 			fill: rgb(35,131,226);
 		}
-		.${SIDE_PEEK_MENU_CLASS}.active > .${SIDE_PEEK_MENU_ARROW_CLASS} > svg {
+		#${SIDE_PEEK_MENU_ID}.active > .${SIDE_PEEK_MENU_ARROW_CLASS} > svg {
 			fill: #fff;
 		}
-		.${SIDE_PEEK_MENU_CLASS}.active.open > .${SIDE_PEEK_MENU_ARROW_CLASS} > svg,
-		.${SIDE_PEEK_MENU_CLASS}.active > .${SIDE_PEEK_MENU_ARROW_CLASS}:hover > svg {
+		#${SIDE_PEEK_MENU_ID}.active.open > .${SIDE_PEEK_MENU_ARROW_CLASS} > svg,
+		#${SIDE_PEEK_MENU_ID}.active > .${SIDE_PEEK_MENU_ARROW_CLASS}:hover > svg {
 			fill: red;
-		}
-
-		/* link */
-		.${SIDE_PEEK_MENU_ACTIVE_VALUE_CLASS} {
-			color: inherit;
-			background: none;
-		}
-		.${SIDE_PEEK_MENU_ACTIVE_VALUE_CLASS} > a {
-			/* background: rgb(35,131,226); */
-			/* color: #fff !important; */
-			font-size: 13px;
-			color: inherit !important;
-			background: none;
-		}
-
-		/* menu values */
-		.${SIDE_PEEK_MENU_VALUES_CLASS} {
-			position: absolute;
-			top: 15px;
-			left: -3px;
-			width: calc(100% + 6px);
-			padding-top: 20px;
-			padding-bottom: 10px;
-			overflow: hidden;
-			z-index: -1;
-			height: 0px;
-			display: flex;
-			flex-direction: column;
-			align-items: flex-start;
-			justify-content: flex-start;
-			color: inherit;
-			background: inherit;
-			border-radius: 0px 0px 20px 20px;
-			border: none;
-		}
-
-		.${SIDE_PEEK_MENU_CLASS}.open > .${SIDE_PEEK_MENU_VALUES_CLASS} {
-			height: auto;
-		}
-
-		.${SIDE_PEEK_MENU_VALUES_CLASS} > a {
-			border: none;
-			padding-right: 6px;
-			cursor: pointer;
-			font-size: 13px;
-			text-align: center;
-			color: inherit !important;
-			background: none;
-			/* border: 1px solid transparent; */
 		}
 	`;
 	document.head.appendChild(sidePeekMenuStyle);
 
 	let sidePeekMenu = null;
-	let sidePeekIcon = null;
+	let sidePeekIndicator = null;
 	let activeValue = null;
 	let values = null;
 	function buildSidePeekMenu() {
 		
-		sidePeekMenu = document.createElement("div");
-		sidePeekMenu.id = SIDE_PEEK_MENU_ID;
-		sidePeekMenu.classList.add(SIDE_PEEK_MENU_CLASS);
+		const sidePeekButton = document.createElement("div");
+		sidePeekButton.id = SIDE_PEEK_BUTTON_ID;
 
-		sidePeekIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-
+		const sidePeekIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 		sidePeekIcon.setAttribute("aria-hidden", "true");
 		sidePeekIcon.setAttribute("role", "graphics-symbol");
 		sidePeekIcon.setAttribute("viewBox", "0 0 20 20");
-		sidePeekIcon.classList.add("peekSide", "directional-icon", "tm-notion-side-peek-menu-side-peek-icon");
+		sidePeekIcon.classList.add("peekSide", "directional-icon");
 		const path1 = document.createElementNS("http://www.w3.org/2000/svg", "path");
 		path1.setAttribute("d", "M10.392 6.125a.5.5 0 0 0-.5.5v6.75a.5.5 0 0 0 .5.5h4.683a.5.5 0 0 0 .5-.5v-6.75a.5.5 0 0 0-.5-.5z");
 		const path2 = document.createElementNS("http://www.w3.org/2000/svg", "path");
 		path2.setAttribute("d", "M4.5 4.125A2.125 2.125 0 0 0 2.375 6.25v7.5c0 1.174.951 2.125 2.125 2.125h11a2.125 2.125 0 0 0 2.125-2.125v-7.5A2.125 2.125 0 0 0 15.5 4.125zM3.625 6.25c0-.483.392-.875.875-.875h11c.483 0 .875.392.875.875v7.5a.875.875 0 0 1-.875.875h-11a.875.875 0 0 1-.875-.875z");
 		sidePeekIcon.appendChild(path1);
 		sidePeekIcon.appendChild(path2);
-		sidePeekMenu.appendChild(sidePeekIcon);
+		sidePeekIndicator = document.createElement("div");
+		sidePeekIndicator.classList.add(SIDE_PEEK_INDICATOR_CLASS);
+		sidePeekIndicator.appendChild(sidePeekIcon);
+		sidePeekButton.appendChild(sidePeekIndicator);
+
+
+		sidePeekMenu = document.createElement("div");
+		sidePeekMenu.id = SIDE_PEEK_MENU_ID;
+		sidePeekButton.appendChild(sidePeekMenu);
 
 		activeValue = document.createElement("div");
 		activeValue.classList.add(SIDE_PEEK_MENU_ACTIVE_VALUE_CLASS);
@@ -329,7 +343,7 @@
 		values.classList.add(SIDE_PEEK_MENU_VALUES_CLASS);
 		sidePeekMenu.appendChild(values);
 
-		topBarButtonsContainer.appendChild(sidePeekMenu);
+		topBarButtonsContainer.appendChild(sidePeekButton);
 
 		return sidePeekMenu;
 	}
@@ -411,15 +425,15 @@
 	// update side peek menu/button / active flag and side peek icon active flag
 	function refreshSidePeekStyle() {
 
+		if (sidePeekIndicator) {
+			sidePeekIndicator.classList.toggle("active", isSidePeekOpen());
+		}
+
 		if (sidePeekMenu) {
 			const activeLink = getActiveLink();
 			if (activeLink) {
  				sidePeekMenu.classList.toggle("active", isPageOpenInSidePeek(pageParam(activeLink.id)));
 			}
-		}
-
-		if (sidePeekIcon) {
-			sidePeekIcon.classList.toggle("active", isSidePeekOpen());
 		}
 	}
 
