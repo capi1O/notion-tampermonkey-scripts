@@ -20,7 +20,8 @@
 			padding-right: 12px;
 		}
 
-		.tm-notion-side-peek-btns-container {
+		.tm-notion-side-peek-menu {
+			position: relative;
 			margin-left: 8px;
 			display: flex;
 			flex-direction: row;
@@ -28,23 +29,92 @@
 			justify-content: flex-end;
 			gap: 6px;
 			flex-wrap: nowrap;
-			flex-grow: 1;
+			/* flex-grow: 1; */
 			flex-shrink: 0;
 			flex-basis: auto;
 			min-width: max-content;
-			border-radius: 6px;
+			background: rgb(244,245,247);
+			border-radius: 20px;
 			border-style: solid;
 			border-color: transparent;
+			padding: 0px 5px 0px 10px; /* top right bottom left*/
+			overflow: hidden;
 		}
 
-		.tm-notion-side-peek-btns-container.active {
-			border-color: rgb(35,131,226);
+		.tm-notion-side-peek-menu.open {
+			overflow: visible;
 		}
 
-		.tm-notion-side-peek-btns-container > a {
-			padding-right: 6px;
-			border-radius: 6px;
+
+		/* side peek icon */
+		.tm-notion-side-peek-menu-side-peek-icon {
+			width: 20px;
+			height: 20px;
+			display: block;
+			flex-shrink: 0;
+			fill: #333 !important;
+		}
+		.tm-notion-side-peek-menu.active > .tm-notion-side-peek-menu-side-peek-icon {
+			fill: rgb(35,131,226) !important;
+		}
+
+		/* arrow button */
+		.tm-notion-side-peek-menu-arrow {
+			padding: 7px;
+			cursor: pointer;
+		}
+		.tm-notion-side-peek-menu-arrow > svg {
+			width: 0.8em;
+			height: 0.8em;
+			display: block;
+			flex-shrink: 0;
+			color: inherit;
+			transition: transform 200ms ease-out;
+			transform: rotateZ(0deg);
+			opacity: 1;
+			fill: #333 !important;
+		}
+		.tm-notion-side-peek-menu.open > .tm-notion-side-peek-menu-arrow > svg,
+		.tm-notion-side-peek-menu-arrow:hover > svg {
+			fill: rgb(35,131,226) !important;
+		}
+
+		/* link */
+		.tm-notion-side-peek-menu-active-value > a {
+			/* background: rgb(35,131,226); */
+			/* color: #fff !important; */
+			font-size: 13px;
+			color: #333 !important;
+			background: rgb(244,245,247);
+		}
+
+		/* menu values */
+		.tm-notion-side-peek-menu-values {
+			position: absolute;
+			top: 15px;
+			left: -3px;
+			width: calc(100% + 6px);
+			padding-top: 20px;
+			padding-bottom: 10px;
+			overflow: hidden;
+			z-index: -1;
+			height: 0px;
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start; /* x: align left */
+			justify-content: flex-start; /* y: top */
+			background: rgb(244,245,247);
+			border-radius: 0px 0px 20px 20px;
+			border-style: solid;
+		}
+
+		.tm-notion-side-peek-menu.open > .tm-notion-side-peek-menu-values {
+			height: auto;
+		}
+
+		.tm-notion-side-peek-menu-values > a {
 			border: none;
+			padding-right: 6px;
 			background: rgb(244,245,247);
 			cursor: pointer;
 			font-size: 13px;
@@ -53,25 +123,9 @@
 			/* border: 1px solid transparent; */
 		}
 
-		.tm-notion-side-peek-btns-container > a.active {
-			background: rgb(35,131,226);
-			color: #fff !important;
-		}
-
-		.tm-notion-side-peek-btns-container > *:not(:first-child) {
-			display: none;
-		}
-
-		.tm-notion-side-peek-btns-container:hover > *:not(:first-child) {
-			display: block;
-		}
-
+		/* hidden stuff */
 		.tm-notion-hide, .shadow-cursor-breadcrumb, .notion-topbar-share-menu, .notion-topbar-favorite-button {
 			display: none !important;
-		}
-
-		#tm-notion-sidepeek-backlog-btn {
-		pointer-events: none;
 		}
 	`;
 	document.head.appendChild(style);
@@ -120,9 +174,8 @@
 					// console.log('topbar and breadcrumb found, attaching');
 					attach(topbar, breadcrumb);
 					repositionTopBarButtonsContainer();
-					buildSidePeekButtonsContainer();
-					// buildBacklogButton();
-					moveBacklogLink();
+					buildSidePeekMenu();
+					movePageLinksToMenu();
 				}
 				// else console.log('breadcrumb not found');
 
@@ -153,10 +206,9 @@
 	// reactive updates (read-only)
 	const reactiveObserver = new MutationObserver(() => {
 		repositionTopBarButtonsContainer();
-		refreshSidePeekButtonsContainerStyle();
-		// refreshBacklogButtonStyle();
-		moveBacklogLink(); // not really read-only but required dto move button on load
-		refreshBacklogLinkStyle();
+		refreshSidePeekMenuStyle();
+		movePageLinksToMenu(); // not really read-only but required to move link on load
+		refreshPageLinksStyle();
 	});
 
 	reactiveObserver.observe(document.body, { childList: true, subtree: true });
@@ -193,94 +245,148 @@
 	}
 
 
-	// SIDE PEEK BUTTONS
-	const SIDE_PEEK_BTNS_CONTAINER_ID = "tm-notion-side-peek-btns-container";
+	// SIDE PEEK MENU
+	const SIDE_PEEK_MENU_ID = "tm-notion-side-peek-menu";
 
-	let sidePeekButtonsContainer = null;
-	function buildSidePeekButtonsContainer() {
-		// let buttonsContainer = document.getElementById(BTNS_CONTAINER_ID);
+	let sidePeekMenu = null;
+	let activeValue = null;
+	let values = null;
+	function buildSidePeekMenu() {
 		
-		sidePeekButtonsContainer = document.createElement("div");
-		sidePeekButtonsContainer.id = SIDE_PEEK_BTNS_CONTAINER_ID;
-		sidePeekButtonsContainer.classList.add('tm-notion-side-peek-btns-container');
-		topBarButtonsContainer.appendChild(sidePeekButtonsContainer);
+		sidePeekMenu = document.createElement("div");
+		sidePeekMenu.id = SIDE_PEEK_MENU_ID;
+		sidePeekMenu.classList.add('tm-notion-side-peek-menu');
 
-		return sidePeekButtonsContainer;
+		const sidePeekIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+
+		sidePeekIcon.setAttribute("aria-hidden", "true");
+		sidePeekIcon.setAttribute("role", "graphics-symbol");
+		sidePeekIcon.setAttribute("viewBox", "0 0 20 20");
+		sidePeekIcon.classList.add("peekSide", "directional-icon", "tm-notion-side-peek-menu-side-peek-icon");
+		const path1 = document.createElementNS("http://www.w3.org/2000/svg", "path");
+		path1.setAttribute("d", "M10.392 6.125a.5.5 0 0 0-.5.5v6.75a.5.5 0 0 0 .5.5h4.683a.5.5 0 0 0 .5-.5v-6.75a.5.5 0 0 0-.5-.5z");
+		const path2 = document.createElementNS("http://www.w3.org/2000/svg", "path");
+		path2.setAttribute("d", "M4.5 4.125A2.125 2.125 0 0 0 2.375 6.25v7.5c0 1.174.951 2.125 2.125 2.125h11a2.125 2.125 0 0 0 2.125-2.125v-7.5A2.125 2.125 0 0 0 15.5 4.125zM3.625 6.25c0-.483.392-.875.875-.875h11c.483 0 .875.392.875.875v7.5a.875.875 0 0 1-.875.875h-11a.875.875 0 0 1-.875-.875z");
+		sidePeekIcon.appendChild(path1);
+		sidePeekIcon.appendChild(path2);
+		sidePeekMenu.appendChild(sidePeekIcon);
+
+		activeValue = document.createElement("div");
+		activeValue.classList.add('tm-notion-side-peek-menu-active-value');
+		sidePeekMenu.appendChild(activeValue);
+
+		const arrowIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+		arrowIcon.setAttribute("aria-hidden", "true");
+		arrowIcon.setAttribute("role", "graphics-symbol");
+		arrowIcon.setAttribute("viewBox", "0 0 16 16");
+		arrowIcon.classList.add("arrowCaretDownFillSmall");
+		const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+		path.setAttribute("d", "M2.835 3.25a.8.8 0 0 0-.69 1.203l5.164 8.854a.8.8 0 0 0 1.382 0l5.165-8.854a.8.8 0 0 0-.691-1.203z");
+		arrowIcon.appendChild(path);
+		const arrow = document.createElement("div");
+		arrow.classList.add('tm-notion-side-peek-menu-arrow');
+		arrow.appendChild(arrowIcon);
+		arrow.onclick = event => {
+			event.stopPropagation();
+			sidePeekMenu.classList.toggle("open");
+		};
+		sidePeekMenu.appendChild(arrow);
+
+		values = document.createElement("div");
+		values.classList.add('tm-notion-side-peek-menu-values');
+		sidePeekMenu.appendChild(values);
+
+		topBarButtonsContainer.appendChild(sidePeekMenu);
+
+		return sidePeekMenu;
 	}
+
+
+	function onLinkClick(link, event) {
+		
+		// 0. check if click linked is not already active
+		if (!!link.closest('.active-value')) return;
+
+		// 1. get current active link
+		const oldActiveLink = activeValue.querySelector('a');
+
+		// 2. move old to menu
+		if (oldActiveLink) values.appendChild(oldActiveLink);
+
+		// 2. move new to active
+		// activeValue.innerHTML = "";
+		activeValue.appendChild(link);
+
+
+		sidePeekMenu.classList.remove("open");
+	}
+
 	function isSidePeekOpen() {
 		return /[?&]p=/.test(location.search);
 	}
-	function refreshSidePeekButtonsContainerStyle() {
-		if (!sidePeekButtonsContainer) return;
+	function refreshSidePeekMenuStyle() {
+		if (!sidePeekMenu) return;
 
-		sidePeekButtonsContainer.classList.toggle("active", isSidePeekOpen())
+		sidePeekMenu.classList.toggle("active", isSidePeekOpen())
 	}
-	onUrlChange(refreshSidePeekButtonsContainerStyle);
-	window.addEventListener("visibilitychange", refreshSidePeekButtonsContainerStyle);
+	onUrlChange(refreshSidePeekMenuStyle);
+	window.addEventListener("visibilitychange", refreshSidePeekMenuStyle);
 
 
-	// BACKLOG BUTTON
-	const BACKLOG_LINK_BLOCK_ID = "27a9f56f-f579-41f8-83ea-5147c7f99bb5";
-	// const BACKLOG_BTN_ID = "tm-notion-sidepeek-backlog-btn";
-	const PAGE_P_PARAM = "27a9f56ff57941f883ea5147c7f99bb5";
-	function isBacklogOpenInSidePeek() {
-		return location.search.includes(`p=${PAGE_P_PARAM}`);
+	// PAGE LINKS
+	const pageIds = {
+		backlog: "27a9f56f-f579-41f8-83ea-5147c7f99bb5",
+		overdue: "74dc1bfe-79a6-822e-b4ac-819b0856981f",
+		calendar: "18cc1bfe-79a6-80c3-b86e-daacaf85cd5d",
+		codeTasks: "18cc1bfe-79a6-80ca-852d-e4e762e389d8",
+		boatTasks: "18cc1bfe-79a6-805c-9f38-fa6b5f790d4e",
+		appProjects: "196c1bfe-79a6-801b-afdc-f467feaf038c"
+	};
+	const pageParam = (pageId) => pageId.replace("-", "");
+
+	function isPageOpenInSidePeek(pageParam) {
+		console.log(`isPageOpenInSidePeek ${pageParam}`);
+		return location.search.includes(`p=${pageParam}`);
 	}
 
-	// let backlogButton = null;
-	// function buildBacklogButton() {
-	// 	if (backlogButton) return backlogButton;
-
-	// 	backlogButton = document.createElement("button");
-	// 	backlogButton.id = BACKLOG_BTN_ID;
-	// 	backlogButton.innerHTML = `
-	// 		<span style="font-size:18px;">🗄️</span>
-	// 		<span style="font-size:16px;font-weight:600;margin-left:8px;">Backlog</span>
-	// 	`;
-	// 	backlogButton.classList.add('tm-notion-side-peek-btn');
-
-	// 	// backlogButton.onclick = openBacklogInSidePeek;
-	// 	// backlogButton.onmouseenter = () => (backlogButton.style.transform = "translateY(-1px)");
-	// 	// backlogButton.onmouseleave = () => (backlogButton.style.transform = "translateY(0)");
-
-	// 	sidePeekButtonsContainer.appendChild(backlogButton);
-	// }
-
-	// function refreshBacklogButtonStyle() {
-	// 	if (!backlogButton) return;
-
-	// 	backlogButton.classList.toggle("active", isBacklogOpenInSidePeek())
-	// }
-	// window.addEventListener("popstate", refreshBacklogButtonStyle);
-	// window.addEventListener("visibilitychange", refreshBacklogButtonStyle);
-
-	// Move real notion backlog link/button in side peek container
-	// let backlogLink = null;
-	function moveBacklogLink() {
-		const backlogLink = document.querySelector(`[data-block-id="${BACKLOG_LINK_BLOCK_ID}"] a`);
-		if (!backlogLink || !sidePeekButtonsContainer) return;
-		sidePeekButtonsContainer.appendChild(backlogLink);
+	// Move real notion page link/button in side peek container
+	function movePageLinksToMenu() {
+		Object.entries(pageIds).forEach(([key, pageId]) => {
+			const pageLink = document.querySelector(`[data-block-id="${pageId}"] a`);
+			if (!pageLink || !sidePeekMenu) return;
+			pageLink.id = pageId;
+			pageLink.onclick = (event) =>  onLinkClick(pageLink, event);
+			// sidePeekMenu.querySelector('.tm-notion-side-peek-menu-values').appendChild(pageLink);
+			if (key === "backlog") activeValue.appendChild(pageLink);
+			else values.appendChild(pageLink);
+		});
+		// set backlog as active
 	}
-	window.addEventListener("resize", moveBacklogLink);
-	window.addEventListener("scroll", moveBacklogLink, true);
+	window.addEventListener("resize", movePageLinksToMenu);
+	window.addEventListener("scroll", movePageLinksToMenu, true);
 
-	function refreshBacklogLinkStyle() {
+	function refreshPageLinksStyle() {
 
-		if (!sidePeekButtonsContainer) return;
+		if (!sidePeekMenu) return;
 
-		const	backlogLink = sidePeekButtonsContainer.querySelector('a');
-		if (!backlogLink) {
-			console.log('refreshBacklogLinkStyle, link not found');
+		const	links = sidePeekMenu.querySelectorAll('tm-notion-side-peek-menu-values > a');
+		if (!links) {
+			console.log('refreshPageLinksStyle, links not found');
 			return;
 		}
-		console.log('refreshBacklogLinkStyle, link found');
-		backlogLink.classList.toggle("active", isBacklogOpenInSidePeek())
+
+		links.forEach(link => {
+			const linkId = link?.id;
+			const pageId = pageIds[linkId];
+			if (pageId) link.classList.toggle("active", isPageOpenInSidePeek(pageParam(pageId)));
+			else console.log(`refreshPageLinksStyle, found no pageId for link ${linkId}`);
+		});
 	}
 
-	onUrlChange(refreshBacklogLinkStyle);
-	window.addEventListener("visibilitychange", refreshBacklogLinkStyle);
+	onUrlChange(refreshPageLinksStyle);
+	window.addEventListener("visibilitychange", refreshPageLinksStyle);
 
-		function onUrlChange(cb) {
+	function onUrlChange(cb) {
 		const _push = history.pushState;
 		const _replace = history.replaceState;
 
