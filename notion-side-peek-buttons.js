@@ -9,7 +9,6 @@
 	const NOTION_TOPBAR_SELECTOR = ".notion-topbar";
 	const NOTION_BREADCRUMB_SELECTOR = ".shadow-cursor-breadcrumb";
 	const TOP_BAR_BTNS_CONTAINER_ID = "tm-notion-top-bar-btns-container";
-	const TOP_BAR_BTNS_CONTAINER_CLASS = "tm-notion-top-bar-btns-container";
 	const NOTION_HIDE_CLASS = "tm-notion-hide";
 
 	// buttons container is added to top bar (.notion-frame) and manually styled to match target width
@@ -19,7 +18,7 @@
 	// CSS styling
 	const buttonsContainerStyle = document.createElement('style');
 	buttonsContainerStyle.textContent = `
-		.${TOP_BAR_BTNS_CONTAINER_CLASS} {
+		#${TOP_BAR_BTNS_CONTAINER_ID} {
 			position: absolute;
 			top: 6px;
 			display: flex;
@@ -44,7 +43,6 @@
 		
 		topBarButtonsContainer = document.createElement("div");
 		topBarButtonsContainer.id = TOP_BAR_BTNS_CONTAINER_ID;
-		topBarButtonsContainer.classList.add(TOP_BAR_BTNS_CONTAINER_CLASS);
 
 		return topBarButtonsContainer;
 	}
@@ -145,11 +143,11 @@
 	// SIDE PEEK MENU
 	// const SIDE_PEEK_MENU_ID = "tm-notion-side-peek-menu";
 	const SIDE_PEEK_BUTTON_ID = "tm-notion-side-peek-button";
-	const SIDE_PEEK_INDICATOR_CLASS = "tm-notion-side-peek-indicator";
+	const SIDE_PEEK_INDICATOR_ID = "tm-notion-side-peek-indicator";
 	const SIDE_PEEK_MENU_ID = "tm-notion-side-peek-menu";
-	const SIDE_PEEK_MENU_ARROW_CLASS = "tm-notion-side-peek-menu-arrow";
-	const SIDE_PEEK_MENU_ACTIVE_VALUE_CLASS = "tm-notion-side-peek-menu-active-value";
-	const SIDE_PEEK_MENU_VALUES_CLASS = "tm-notion-side-peek-menu-values";
+	const SIDE_PEEK_MENU_ARROW_ID = "tm-notion-side-peek-menu-arrow";
+	const SIDE_PEEK_MENU_ACTIVE_VALUE_ID = "tm-notion-side-peek-menu-active-value";
+	const SIDE_PEEK_MENU_VALUES_ID = "tm-notion-side-peek-menu-values";
 
 	// CSS styling
 	const sidePeekMenuStyle = document.createElement('style');
@@ -166,24 +164,24 @@
 		}
 
 		/* side peek icon on the left */
-		.${SIDE_PEEK_INDICATOR_CLASS} {
+		#${SIDE_PEEK_INDICATOR_ID} {
 			border-radius: 20px 0px 0px 20px; /* top-left | top-right | bottom-right | bottom-left */
 			color: #333;
 			background: rgb(244,245,247);
 			padding: 7px 5px 7px 10px; /* top | right | bottom | left*/
 		}
-		.${SIDE_PEEK_INDICATOR_CLASS} > svg {
+		#${SIDE_PEEK_INDICATOR_ID} > svg {
 			width: 20px;
 			height: 20px;
 			display: block;
 			flex-shrink: 0;
 			fill: #333;
 		}
-		.${SIDE_PEEK_INDICATOR_CLASS}.active {
+		#${SIDE_PEEK_INDICATOR_ID}.active {
 			color: #fff;
 			background: rgb(35,131,226);
 		}
-		.${SIDE_PEEK_INDICATOR_CLASS}.active > svg {
+		#${SIDE_PEEK_INDICATOR_ID}.active > svg {
 			fill: #fff;
 		}
 
@@ -213,18 +211,18 @@
 		}
 
 		/* link */
-		.${SIDE_PEEK_MENU_ACTIVE_VALUE_CLASS} {
+		#${SIDE_PEEK_MENU_ACTIVE_VALUE_ID} {
 			color: inherit;
 			background: none;
 		}
-		.${SIDE_PEEK_MENU_ACTIVE_VALUE_CLASS} > a {
+		#${SIDE_PEEK_MENU_ACTIVE_VALUE_ID} > a {
 			font-size: 13px;
 			color: inherit !important;
 			background: none;
 		}
 
 		/* menu values */
-		.${SIDE_PEEK_MENU_VALUES_CLASS} {
+		#${SIDE_PEEK_MENU_VALUES_ID} {
 			position: absolute;
 			top: 15px;
 			left: 0px;
@@ -243,11 +241,11 @@
 			border: none;
 		}
 
-		#${SIDE_PEEK_MENU_ID}.open > .${SIDE_PEEK_MENU_VALUES_CLASS} {
+		#${SIDE_PEEK_MENU_ID}.open > #${SIDE_PEEK_MENU_VALUES_ID} {
 			height: auto;
 		}
 
-		.${SIDE_PEEK_MENU_VALUES_CLASS} > a {
+		#${SIDE_PEEK_MENU_VALUES_ID} > a {
 			border: none;
 			padding-right: 6px;
 			cursor: pointer;
@@ -259,11 +257,11 @@
 		}
 
 		/* arrow button */
-		.${SIDE_PEEK_MENU_ARROW_CLASS} {
+		#${SIDE_PEEK_MENU_ARROW_ID} {
 			padding: 7px;
 			cursor: pointer;
 		}
-		.${SIDE_PEEK_MENU_ARROW_CLASS} > svg {
+		#${SIDE_PEEK_MENU_ARROW_ID} > svg {
 			width: 0.8em;
 			height: 0.8em;
 			display: block;
@@ -274,15 +272,15 @@
 			opacity: 1;
 			fill: #333;
 		}
-		#${SIDE_PEEK_MENU_ID}.open > .${SIDE_PEEK_MENU_ARROW_CLASS} > svg,
-		.${SIDE_PEEK_MENU_ARROW_CLASS}:hover > svg {
+		#${SIDE_PEEK_MENU_ID}.open > #${SIDE_PEEK_MENU_ARROW_ID} > svg,
+		#${SIDE_PEEK_MENU_ARROW_ID}:hover > svg {
 			fill: rgb(35,131,226);
 		}
-		#${SIDE_PEEK_MENU_ID}.active > .${SIDE_PEEK_MENU_ARROW_CLASS} > svg {
+		#${SIDE_PEEK_MENU_ID}.active > #${SIDE_PEEK_MENU_ARROW_ID} > svg {
 			fill: #fff;
 		}
-		#${SIDE_PEEK_MENU_ID}.active.open > .${SIDE_PEEK_MENU_ARROW_CLASS} > svg,
-		#${SIDE_PEEK_MENU_ID}.active > .${SIDE_PEEK_MENU_ARROW_CLASS}:hover > svg {
+		#${SIDE_PEEK_MENU_ID}.active.open > #${SIDE_PEEK_MENU_ARROW_ID} > svg,
+		#${SIDE_PEEK_MENU_ID}.active > #${SIDE_PEEK_MENU_ARROW_ID}:hover > svg {
 			fill: red;
 		}
 	`;
@@ -309,7 +307,7 @@
 		sidePeekIcon.appendChild(path1);
 		sidePeekIcon.appendChild(path2);
 		sidePeekIndicator = document.createElement("div");
-		sidePeekIndicator.classList.add(SIDE_PEEK_INDICATOR_CLASS);
+		sidePeekIndicator.id = SIDE_PEEK_INDICATOR_ID;
 		sidePeekIndicator.appendChild(sidePeekIcon);
 		sidePeekButton.appendChild(sidePeekIndicator);
 
@@ -319,7 +317,7 @@
 		sidePeekButton.appendChild(sidePeekMenu);
 
 		activeValue = document.createElement("div");
-		activeValue.classList.add(SIDE_PEEK_MENU_ACTIVE_VALUE_CLASS);
+		activeValue.id = SIDE_PEEK_MENU_ACTIVE_VALUE_ID;
 		sidePeekMenu.appendChild(activeValue);
 
 		const arrowIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -331,7 +329,7 @@
 		path.setAttribute("d", "M2.835 3.25a.8.8 0 0 0-.69 1.203l5.164 8.854a.8.8 0 0 0 1.382 0l5.165-8.854a.8.8 0 0 0-.691-1.203z");
 		arrowIcon.appendChild(path);
 		const arrow = document.createElement("div");
-		arrow.classList.add(SIDE_PEEK_MENU_ARROW_CLASS);
+		arrow.id = SIDE_PEEK_MENU_ARROW_ID;
 		arrow.appendChild(arrowIcon);
 		arrow.onclick = event => {
 			event.stopPropagation();
@@ -340,7 +338,7 @@
 		sidePeekMenu.appendChild(arrow);
 
 		values = document.createElement("div");
-		values.classList.add(SIDE_PEEK_MENU_VALUES_CLASS);
+		values.id = SIDE_PEEK_MENU_VALUES_ID;
 		sidePeekMenu.appendChild(values);
 
 		topBarButtonsContainer.appendChild(sidePeekButton);
@@ -356,7 +354,7 @@
 	function onLinkClick(link, event) {
 		
 		// 0. check if click linked is not already active
-		if (!!link.closest(`.${SIDE_PEEK_MENU_ACTIVE_VALUE_CLASS}`)) return;
+		if (!!link.closest(`.${SIDE_PEEK_MENU_ACTIVE_VALUE_ID}`)) return;
 
 		// 1. get current active link
 		const oldActiveLink = getActiveLink();
