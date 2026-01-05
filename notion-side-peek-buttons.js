@@ -4,11 +4,22 @@
 // ==/UserScript==
 
 (() => {
-	// CSS styling
-	const style = document.createElement('style');
-	style.textContent = `
 
-		.tm-notion-top-bar-btns-container {
+	// TOP BAR BUTTONS CONTAINER
+	const NOTION_TOPBAR_SELECTOR = ".notion-topbar";
+	const NOTION_BREADCRUMB_SELECTOR = ".shadow-cursor-breadcrumb";
+	const TOP_BAR_BTNS_CONTAINER_ID = "tm-notion-top-bar-btns-container";
+	const TOP_BAR_BTNS_CONTAINER_CLASS = "tm-notion-top-bar-btns-container";
+	const NOTION_HIDE_CLASS = "tm-notion-hide";
+
+	// buttons container is added to top bar (.notion-frame) and manually styled to match target width
+	const TARGET_SELECTOR =
+	".notion-frame > .notion-selectable-container > .notion-scroller.vertical > div > .layout > .layout-content";
+
+	// CSS styling
+	const buttonsContainerStyle = document.createElement('style');
+	buttonsContainerStyle.textContent = `
+		.${TOP_BAR_BTNS_CONTAINER_CLASS} {
 			position: absolute;
 			top: 6px;
 			display: flex;
@@ -20,148 +31,11 @@
 			padding-right: 12px;
 		}
 
-		.tm-notion-side-peek-menu {
-			position: relative;
-			margin-left: 8px;
-			display: flex;
-			flex-direction: row;
-			align-items: center;
-			justify-content: flex-end;
-			gap: 6px;
-			flex-wrap: nowrap;
-			/* flex-grow: 1; */
-			flex-shrink: 0;
-			flex-basis: auto;
-			min-width: max-content;
-			color: #333;
-			background: rgb(244,245,247);
-			border-radius: 20px;
-			border-style: solid;
-			border-color: transparent;
-			padding: 0px 5px 0px 10px; /* top right bottom left*/
-			overflow: hidden;
-		}
-		.tm-notion-side-peek-menu.active {
-			color: #fff;
-			background: rgb(35,131,226);
-		}
-
-		.tm-notion-side-peek-menu.open {
-			overflow: visible;
-		}
-
-
-		/* side peek icon */
-		.tm-notion-side-peek-menu-side-peek-icon {
-			width: 20px;
-			height: 20px;
-			display: block;
-			flex-shrink: 0;
-			fill: #333;
-		}
-		.tm-notion-side-peek-menu-side-peek-icon.active {
-			fill: rgb(35,131,226);
-		}
-		.tm-notion-side-peek-menu.active > .tm-notion-side-peek-menu-side-peek-icon {
-			fill: #fff;
-		}
-		.tm-notion-side-peek-menu.active > .tm-notion-side-peek-menu-side-peek-icon.active {
-			fill: red;
-		}
-
-		/* arrow button */
-		.tm-notion-side-peek-menu-arrow {
-			padding: 7px;
-			cursor: pointer;
-		}
-		.tm-notion-side-peek-menu-arrow > svg {
-			width: 0.8em;
-			height: 0.8em;
-			display: block;
-			flex-shrink: 0;
-			color: inherit;
-			transition: transform 200ms ease-out;
-			transform: rotateZ(0deg);
-			opacity: 1;
-			fill: #333;
-		}
-		.tm-notion-side-peek-menu.open > .tm-notion-side-peek-menu-arrow > svg,
-		.tm-notion-side-peek-menu-arrow:hover > svg {
-			fill: rgb(35,131,226);
-		}
-		.tm-notion-side-peek-menu.active > .tm-notion-side-peek-menu-arrow > svg {
-			fill: #fff;
-		}
-		.tm-notion-side-peek-menu.active.open > .tm-notion-side-peek-menu-arrow > svg,
-		.tm-notion-side-peek-menu.active > .tm-notion-side-peek-menu-arrow:hover > svg {
-			fill: red;
-		}
-
-		/* link */
-		.tm-notion-side-peek-menu-active-value {
-			color: inherit;
-			background: none;
-		}
-		.tm-notion-side-peek-menu-active-value > a {
-			/* background: rgb(35,131,226); */
-			/* color: #fff !important; */
-			font-size: 13px;
-			color: inherit !important;
-			background: none;
-		}
-
-		/* menu values */
-		.tm-notion-side-peek-menu-values {
-			position: absolute;
-			top: 15px;
-			left: -3px;
-			width: calc(100% + 6px);
-			padding-top: 20px;
-			padding-bottom: 10px;
-			overflow: hidden;
-			z-index: -1;
-			height: 0px;
-			display: flex;
-			flex-direction: column;
-			align-items: flex-start;
-			justify-content: flex-start;
-			color: inherit;
-			background: inherit;
-			border-radius: 0px 0px 20px 20px;
-			border: none;
-		}
-
-		.tm-notion-side-peek-menu.open > .tm-notion-side-peek-menu-values {
-			height: auto;
-		}
-
-		.tm-notion-side-peek-menu-values > a {
-			border: none;
-			padding-right: 6px;
-			cursor: pointer;
-			font-size: 13px;
-			text-align: center;
-			color: inherit !important;
-			background: none;
-			/* border: 1px solid transparent; */
-		}
-
-		/* hidden stuff */
-		.tm-notion-hide, .shadow-cursor-breadcrumb, .notion-topbar-share-menu, .notion-topbar-favorite-button {
+		.${NOTION_HIDE_CLASS}, .shadow-cursor-breadcrumb, .notion-topbar-share-menu, .notion-topbar-favorite-button {
 			display: none !important;
 		}
 	`;
-	document.head.appendChild(style);
-
-
-	// TOP BAR BUTTONS CONTAINER
-	const NOTION_TOPBAR_SELECTOR = ".notion-topbar";
-	const NOTION_BREADCRUMB_SELECTOR = ".shadow-cursor-breadcrumb";
-	const TOP_BAR_BTNS_CONTAINER_ID = "tm-notion-top-bar-btns-container";
-
-	// buttons container is added to top bar (.notion-frame) and manually styled to match target width
-	const TARGET_SELECTOR =
-	".notion-frame > .notion-selectable-container > .notion-scroller.vertical > div > .layout > .layout-content";
+	document.head.appendChild(buttonsContainerStyle);
 
 	let topBarButtonsContainer = null;
 	function buildButtonsContainer() {
@@ -170,7 +44,7 @@
 		
 		topBarButtonsContainer = document.createElement("div");
 		topBarButtonsContainer.id = TOP_BAR_BTNS_CONTAINER_ID;
-		topBarButtonsContainer.classList.add('tm-notion-top-bar-btns-container');
+		topBarButtonsContainer.classList.add(TOP_BAR_BTNS_CONTAINER_CLASS);
 
 		return topBarButtonsContainer;
 	}
@@ -258,7 +132,7 @@
 						if (isFlex) {// && followedByActionButtons
 							// console.log('found flexible space')
 							flexSpaceObserver.disconnect();
-							div.classList.add("tm-notion-hide");
+							div.classList.add(NOTION_HIDE_CLASS);
 						}
 					});
 			}
@@ -270,6 +144,141 @@
 
 	// SIDE PEEK MENU
 	const SIDE_PEEK_MENU_ID = "tm-notion-side-peek-menu";
+	const SIDE_PEEK_MENU_CLASS = "tm-notion-side-peek-menu";
+	const SIDE_PEEK_MENU_ARROW_CLASS = "tm-notion-side-peek-menu-arrow";
+	const SIDE_PEEK_MENU_ACTIVE_VALUE_CLASS = "tm-notion-side-peek-menu-active-value";
+	const SIDE_PEEK_MENU_VALUES_CLASS = "tm-notion-side-peek-menu-values";
+
+	// CSS styling
+	const sidePeekMenuStyle = document.createElement('style');
+	sidePeekMenuStyle.textContent = `
+		.${SIDE_PEEK_MENU_CLASS} {
+			position: relative;
+			margin-left: 8px;
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: flex-end;
+			gap: 6px;
+			flex-wrap: nowrap;
+			/* flex-grow: 1; */
+			flex-shrink: 0;
+			flex-basis: auto;
+			min-width: max-content;
+			color: #333;
+			background: rgb(244,245,247);
+			border-radius: 20px;
+			border-style: solid;
+			border-color: transparent;
+			padding: 0px 5px 0px 10px; /* top right bottom left*/
+			overflow: hidden;
+		}
+		.${SIDE_PEEK_MENU_CLASS}.active {
+			color: #fff;
+			background: rgb(35,131,226);
+		}
+
+		.${SIDE_PEEK_MENU_CLASS}.open {
+			overflow: visible;
+		}
+
+
+		/* side peek icon */
+		.tm-notion-side-peek-menu-side-peek-icon {
+			width: 20px;
+			height: 20px;
+			display: block;
+			flex-shrink: 0;
+			fill: #333;
+		}
+		.tm-notion-side-peek-menu-side-peek-icon.active {
+			fill: rgb(35,131,226);
+		}
+		.${SIDE_PEEK_MENU_CLASS}.active > .tm-notion-side-peek-menu-side-peek-icon {
+			fill: #fff;
+		}
+		.${SIDE_PEEK_MENU_CLASS}.active > .tm-notion-side-peek-menu-side-peek-icon.active {
+			fill: red;
+		}
+
+		/* arrow button */
+		.${SIDE_PEEK_MENU_ARROW_CLASS} {
+			padding: 7px;
+			cursor: pointer;
+		}
+		.${SIDE_PEEK_MENU_ARROW_CLASS} > svg {
+			width: 0.8em;
+			height: 0.8em;
+			display: block;
+			flex-shrink: 0;
+			color: inherit;
+			transition: transform 200ms ease-out;
+			transform: rotateZ(0deg);
+			opacity: 1;
+			fill: #333;
+		}
+		.${SIDE_PEEK_MENU_CLASS}.open > .${SIDE_PEEK_MENU_ARROW_CLASS} > svg,
+		.${SIDE_PEEK_MENU_ARROW_CLASS}:hover > svg {
+			fill: rgb(35,131,226);
+		}
+		.${SIDE_PEEK_MENU_CLASS}.active > .${SIDE_PEEK_MENU_ARROW_CLASS} > svg {
+			fill: #fff;
+		}
+		.${SIDE_PEEK_MENU_CLASS}.active.open > .${SIDE_PEEK_MENU_ARROW_CLASS} > svg,
+		.${SIDE_PEEK_MENU_CLASS}.active > .${SIDE_PEEK_MENU_ARROW_CLASS}:hover > svg {
+			fill: red;
+		}
+
+		/* link */
+		.${SIDE_PEEK_MENU_ACTIVE_VALUE_CLASS} {
+			color: inherit;
+			background: none;
+		}
+		.${SIDE_PEEK_MENU_ACTIVE_VALUE_CLASS} > a {
+			/* background: rgb(35,131,226); */
+			/* color: #fff !important; */
+			font-size: 13px;
+			color: inherit !important;
+			background: none;
+		}
+
+		/* menu values */
+		.${SIDE_PEEK_MENU_VALUES_CLASS} {
+			position: absolute;
+			top: 15px;
+			left: -3px;
+			width: calc(100% + 6px);
+			padding-top: 20px;
+			padding-bottom: 10px;
+			overflow: hidden;
+			z-index: -1;
+			height: 0px;
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			justify-content: flex-start;
+			color: inherit;
+			background: inherit;
+			border-radius: 0px 0px 20px 20px;
+			border: none;
+		}
+
+		.${SIDE_PEEK_MENU_CLASS}.open > .${SIDE_PEEK_MENU_VALUES_CLASS} {
+			height: auto;
+		}
+
+		.${SIDE_PEEK_MENU_VALUES_CLASS} > a {
+			border: none;
+			padding-right: 6px;
+			cursor: pointer;
+			font-size: 13px;
+			text-align: center;
+			color: inherit !important;
+			background: none;
+			/* border: 1px solid transparent; */
+		}
+	`;
+	document.head.appendChild(sidePeekMenuStyle);
 
 	let sidePeekMenu = null;
 	let sidePeekIcon = null;
@@ -279,7 +288,7 @@
 		
 		sidePeekMenu = document.createElement("div");
 		sidePeekMenu.id = SIDE_PEEK_MENU_ID;
-		sidePeekMenu.classList.add('tm-notion-side-peek-menu');
+		sidePeekMenu.classList.add(SIDE_PEEK_MENU_CLASS);
 
 		sidePeekIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 
@@ -296,7 +305,7 @@
 		sidePeekMenu.appendChild(sidePeekIcon);
 
 		activeValue = document.createElement("div");
-		activeValue.classList.add('tm-notion-side-peek-menu-active-value');
+		activeValue.classList.add(SIDE_PEEK_MENU_ACTIVE_VALUE_CLASS);
 		sidePeekMenu.appendChild(activeValue);
 
 		const arrowIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -308,7 +317,7 @@
 		path.setAttribute("d", "M2.835 3.25a.8.8 0 0 0-.69 1.203l5.164 8.854a.8.8 0 0 0 1.382 0l5.165-8.854a.8.8 0 0 0-.691-1.203z");
 		arrowIcon.appendChild(path);
 		const arrow = document.createElement("div");
-		arrow.classList.add('tm-notion-side-peek-menu-arrow');
+		arrow.classList.add(SIDE_PEEK_MENU_ARROW_CLASS);
 		arrow.appendChild(arrowIcon);
 		arrow.onclick = event => {
 			event.stopPropagation();
@@ -317,7 +326,7 @@
 		sidePeekMenu.appendChild(arrow);
 
 		values = document.createElement("div");
-		values.classList.add('tm-notion-side-peek-menu-values');
+		values.classList.add(SIDE_PEEK_MENU_VALUES_CLASS);
 		sidePeekMenu.appendChild(values);
 
 		topBarButtonsContainer.appendChild(sidePeekMenu);
@@ -333,7 +342,7 @@
 	function onLinkClick(link, event) {
 		
 		// 0. check if click linked is not already active
-		if (!!link.closest('.active-value')) return;
+		if (!!link.closest(`.${SIDE_PEEK_MENU_ACTIVE_VALUE_CLASS}`)) return;
 
 		// 1. get current active link
 		const oldActiveLink = getActiveLink();
@@ -371,17 +380,16 @@
 		appProjects: "196c1bfe-79a6-801b-afdc-f467feaf038c"
 	};
 
-	// const pageParam = (pageId) => pageId.replace("-", "");
 	function pageParam (pageId) {
 		const result = pageId.replace(/-/g, "");
-		console.log(`pageParam ${pageId} => ${result}`);
+		// console.log(`pageParam ${pageId} => ${result}`);
 		return result;
 	}
 
 
 	function isPageOpenInSidePeek(pgeParam) {
 		const result = location.search.includes(`p=${pgeParam}`);
-		console.log(`isPageOpenInSidePeek, param '${pgeParam}'? ${result}`);
+		// console.log(`isPageOpenInSidePeek, param '${pgeParam}'? ${result}`);
 		return result;
 	}
 
@@ -396,7 +404,6 @@
 			if (key === "backlog") activeValue.appendChild(pageLink);
 			else values.appendChild(pageLink);
 		});
-		// set backlog as active
 	}
 	window.addEventListener("resize", movePageLinksToMenu);
 	window.addEventListener("scroll", movePageLinksToMenu, true);
