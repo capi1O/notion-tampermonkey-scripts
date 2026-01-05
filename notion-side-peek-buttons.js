@@ -205,7 +205,14 @@
 			color: #fff;
 			background: rgb(35,131,226);
 		}
-
+		/* if side peek not opened */
+		#${SIDE_PEEK_INDICATOR_ID}:not(.active) + #${SIDE_PEEK_MENU_ID} {
+			filter: grayscale(1);
+			opacity: 0.5;
+		}
+		#${SIDE_PEEK_INDICATOR_ID}:not(.active) + #${SIDE_PEEK_MENU_ID} a {
+			cursor: all-scroll !important;
+		}
 		#${SIDE_PEEK_MENU_ID}.open {
 			overflow: visible;
 		}
