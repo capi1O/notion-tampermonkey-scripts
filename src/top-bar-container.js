@@ -33,7 +33,7 @@ export const appendStyles = () => {
 };
 
 let topBarButtonsContainer = null;
-const buildButtonsContainer = () => {
+const buildTopBarButtonsContainer = () => {
 	// let buttonsContainer = document.getElementById(BTNS_CONTAINER_ID);
 	if (topBarButtonsContainer) return topBarButtonsContainer;
 	
@@ -49,7 +49,7 @@ export const attach = (topbar, breadcrumb) => {
 		topbar.style.position = "relative";
 	}
 
-	const b = buildButtonsContainer();
+	const b = buildTopBarButtonsContainer();
 	if (!topbar.contains(b)) {
 		breadcrumb.after(b);
 	}
