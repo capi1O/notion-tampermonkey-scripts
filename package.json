@@ -6,7 +6,10 @@
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"dev:planning": "rollup -c rollup.planning.config.js -w",
-		"build:planning": "rollup -c rollup.planning.config.js"
+		"dev:wildcard": "rollup -c rollup.wildcard.config.js -w",
+		"build:planning": "rollup -c rollup.planning.config.js",
+		"build:wildcard": "rollup -c rollup.wildcard.config.js",
+		"build": "npm run build:planning && npm run build:wildcard"
 	},
 	"keywords": [],
 	"author": "",
