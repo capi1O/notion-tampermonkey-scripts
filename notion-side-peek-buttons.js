@@ -1,9 +1,4 @@
-// ==UserScript==
-// @name         Notion Side Peek buttons
-// @match        https://www.notion.so/*
-// ==/UserScript==
-
-(() => {
+export const addSidePeekButtons = () => {
 
 	// TOP BAR BUTTONS CONTAINER
 	const NOTION_TOPBAR_SELECTOR = ".notion-topbar";
@@ -462,4 +457,4 @@
 		window.addEventListener("popstate", cb);
 	}
 
-})();
+};

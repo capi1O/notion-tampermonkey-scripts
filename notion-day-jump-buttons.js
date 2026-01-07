@@ -1,9 +1,4 @@
-// ==UserScript==
-// @name         Notion Days Jump buttons
-// @match        https://www.notion.so/*
-// ==/UserScript==
-
-(() => {
+export const addDayJumpButtons = () => {
 
 	const GROUP_HEADER_SELECTOR = ".notion-frame .notion-collection_view-block";
 	const TOP_BAR_BTNS_CONTAINER_ID = "tm-notion-top-bar-btns-container"; // TODO: get from notion-side-peek-buttons.js
@@ -349,4 +344,4 @@
 	attachObserver.observe(document.body, { childList: true, subtree: true });
 
 
-})();
+};
