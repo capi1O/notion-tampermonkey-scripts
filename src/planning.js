@@ -4,15 +4,16 @@
 // ==/UserScript==
 
 import { addDayJumpButtons } from "./planning-day-jump-buttons.js";
-import { appendStyles, attach, repositionTopBarButtonsContainer, hideFlexibleSpace } from "./planning-side-peek-buttons.js";
-import { buildSidePeekButton, movePageLinksToMenu, refreshSidePeekStyle } from "./planning-side-peek-menu.js";
+import { NOTION_TOPBAR_SELECTOR, NOTION_BREADCRUMB_SELECTOR, appendStyles as appendTopBarContainerStyles, attach, repositionTopBarButtonsContainer, hideFlexibleSpace } from "./top-bar-container.js";
+import { appendStyles as appendSidePeekMenuStyles, buildSidePeekButton, movePageLinksToMenu, refreshSidePeekStyle } from "./planning-side-peek-menu.js";
 import { onUrlChange } from './utils.js';
 
 // day jump buttons
-addDayJumpButtons();
+// addDayJumpButtons();
 
 // side peek buttons
-appendStyles();
+appendTopBarContainerStyles();
+appendSidePeekMenuStyles();
 
 
 // TODO: reuse
@@ -23,7 +24,7 @@ const attachObserver = new MutationObserver(() => {
 			if (breadcrumb) {
 				attachObserver.disconnect();
 				// console.log('topbar and breadcrumb found, attaching');
-				attach(topbar, breadcrumb);
+				const topBarButtonsContainer = attach(topbar, breadcrumb);
 				repositionTopBarButtonsContainer();
 				const sidePeekButton = buildSidePeekButton();
 				topBarButtonsContainer.appendChild(sidePeekButton);
@@ -45,7 +46,6 @@ window.addEventListener("scroll", repositionTopBarButtonsContainer, true);
 // reactive updates (read-only)
 const reactiveObserver = new MutationObserver(() => {
 	repositionTopBarButtonsContainer();
-	refreshSidePeekMenuStyle();
 	movePageLinksToMenu(); // not really read-only but required to move link on load
 	refreshSidePeekStyle();
 });

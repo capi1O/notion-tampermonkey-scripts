@@ -8,149 +8,151 @@ const SIDE_PEEK_MENU_ARROW_ID = "tm-notion-side-peek-menu-arrow";
 const SIDE_PEEK_MENU_ACTIVE_VALUE_ID = "tm-notion-side-peek-menu-active-value";
 const SIDE_PEEK_MENU_VALUES_ID = "tm-notion-side-peek-menu-values";
 
-// CSS styling
-const sidePeekMenuStyle = document.createElement('style');
-sidePeekMenuStyle.textContent = `
+export const appendStyles = () => {
 
-	#${SIDE_PEEK_BUTTON_ID} {
-		margin-left: 8px;
-		display: flex;
-		gap: 1px;
-		flex-wrap: nowrap;
-		/* flex-grow: 1; */
-		flex-shrink: 0;
-		flex-basis: auto;
-	}
+	// CSS styling
+	const sidePeekMenuStyle = document.createElement('style');
+	sidePeekMenuStyle.textContent = `
+		#${SIDE_PEEK_BUTTON_ID} {
+			margin-left: 8px;
+			display: flex;
+			gap: 1px;
+			flex-wrap: nowrap;
+			/* flex-grow: 1; */
+			flex-shrink: 0;
+			flex-basis: auto;
+		}
 
-	/* side peek icon on the left */
-	#${SIDE_PEEK_INDICATOR_ID} {
-		border-radius: 20px 0px 0px 20px; /* top-left | top-right | bottom-right | bottom-left */
-		color: #333;
-		background: rgb(244,245,247);
-		padding: 7px 5px 7px 10px; /* top | right | bottom | left*/
-	}
-	#${SIDE_PEEK_INDICATOR_ID} > svg {
-		width: 20px;
-		height: 20px;
-		display: block;
-		flex-shrink: 0;
-		fill: #333;
-	}
-	#${SIDE_PEEK_INDICATOR_ID}.active {
-		color: #fff;
-		background: rgb(35,131,226);
-	}
-	#${SIDE_PEEK_INDICATOR_ID}.active > svg {
-		fill: #fff;
-	}
+		/* side peek icon on the left */
+		#${SIDE_PEEK_INDICATOR_ID} {
+			border-radius: 20px 0px 0px 20px; /* top-left | top-right | bottom-right | bottom-left */
+			color: #333;
+			background: rgb(244,245,247);
+			padding: 7px 5px 7px 10px; /* top | right | bottom | left*/
+		}
+		#${SIDE_PEEK_INDICATOR_ID} > svg {
+			width: 20px;
+			height: 20px;
+			display: block;
+			flex-shrink: 0;
+			fill: #333;
+		}
+		#${SIDE_PEEK_INDICATOR_ID}.active {
+			color: #fff;
+			background: rgb(35,131,226);
+		}
+		#${SIDE_PEEK_INDICATOR_ID}.active > svg {
+			fill: #fff;
+		}
 
 
 
-	/* page links drop down menu */
-	#${SIDE_PEEK_MENU_ID} {
-		position: relative;
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-		justify-content: flex-end;
-		min-width: max-content;
-		color: #333;
-		background: rgb(244,245,247);
-		border-radius: 0px 20px 20px 0px; /* top-left | top-right | bottom-right | bottom-left */
-		padding: 0px 5px 0px 5px; /* top | right | bottom | left*/
-		overflow: hidden;
-	}
-	#${SIDE_PEEK_MENU_ID}.active {
-		color: #fff;
-		background: rgb(35,131,226);
-	}
-	/* if side peek not opened */
-	#${SIDE_PEEK_INDICATOR_ID}:not(.active) + #${SIDE_PEEK_MENU_ID} {
-		filter: grayscale(1);
-		opacity: 0.5;
-	}
-	#${SIDE_PEEK_INDICATOR_ID}:not(.active) + #${SIDE_PEEK_MENU_ID} a {
-		cursor: all-scroll !important;
-	}
-	#${SIDE_PEEK_MENU_ID}.open {
-		overflow: visible;
-	}
+		/* page links drop down menu */
+		#${SIDE_PEEK_MENU_ID} {
+			position: relative;
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: flex-end;
+			min-width: max-content;
+			color: #333;
+			background: rgb(244,245,247);
+			border-radius: 0px 20px 20px 0px; /* top-left | top-right | bottom-right | bottom-left */
+			padding: 0px 5px 0px 5px; /* top | right | bottom | left*/
+			overflow: hidden;
+		}
+		#${SIDE_PEEK_MENU_ID}.active {
+			color: #fff;
+			background: rgb(35,131,226);
+		}
+		/* if side peek not opened */
+		#${SIDE_PEEK_INDICATOR_ID}:not(.active) + #${SIDE_PEEK_MENU_ID} {
+			filter: grayscale(1);
+			opacity: 0.5;
+		}
+		#${SIDE_PEEK_INDICATOR_ID}:not(.active) + #${SIDE_PEEK_MENU_ID} a {
+			cursor: all-scroll !important;
+		}
+		#${SIDE_PEEK_MENU_ID}.open {
+			overflow: visible;
+		}
 
-	/* link */
-	#${SIDE_PEEK_MENU_ACTIVE_VALUE_ID} {
-		color: inherit;
-		background: none;
-	}
-	#${SIDE_PEEK_MENU_ACTIVE_VALUE_ID} > a {
-		font-size: 13px;
-		color: inherit !important;
-		background: none;
-	}
+		/* link */
+		#${SIDE_PEEK_MENU_ACTIVE_VALUE_ID} {
+			color: inherit;
+			background: none;
+		}
+		#${SIDE_PEEK_MENU_ACTIVE_VALUE_ID} > a {
+			font-size: 13px;
+			color: inherit !important;
+			background: none;
+		}
 
-	/* menu values */
-	#${SIDE_PEEK_MENU_VALUES_ID} {
-		position: absolute;
-		top: 15px;
-		left: 0px;
-		width: 100%;
-		padding: 20px 0px 10px 5px; /* top | right | bottom | left*/
-		overflow: hidden;
-		z-index: -1;
-		height: 0px;
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-		justify-content: flex-start;
-		color: inherit;
-		background: inherit;
-		border-radius: 0px 0px 20px 20px; /* top-left | top-right | bottom-right | bottom-left */
-		border: none;
-	}
+		/* menu values */
+		#${SIDE_PEEK_MENU_VALUES_ID} {
+			position: absolute;
+			top: 15px;
+			left: 0px;
+			width: 100%;
+			padding: 20px 0px 10px 5px; /* top | right | bottom | left*/
+			overflow: hidden;
+			z-index: -1;
+			height: 0px;
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			justify-content: flex-start;
+			color: inherit;
+			background: inherit;
+			border-radius: 0px 0px 20px 20px; /* top-left | top-right | bottom-right | bottom-left */
+			border: none;
+		}
 
-	#${SIDE_PEEK_MENU_ID}.open > #${SIDE_PEEK_MENU_VALUES_ID} {
-		height: auto;
-	}
+		#${SIDE_PEEK_MENU_ID}.open > #${SIDE_PEEK_MENU_VALUES_ID} {
+			height: auto;
+		}
 
-	#${SIDE_PEEK_MENU_VALUES_ID} > a {
-		border: none;
-		padding-right: 6px;
-		cursor: pointer;
-		font-size: 13px;
-		text-align: center;
-		color: inherit !important;
-		background: none;
-		/* border: 1px solid transparent; */
-	}
+		#${SIDE_PEEK_MENU_VALUES_ID} > a {
+			border: none;
+			padding-right: 6px;
+			cursor: pointer;
+			font-size: 13px;
+			text-align: center;
+			color: inherit !important;
+			background: none;
+			/* border: 1px solid transparent; */
+		}
 
-	/* arrow button */
-	#${SIDE_PEEK_MENU_ARROW_ID} {
-		padding: 7px;
-		cursor: pointer;
-	}
-	#${SIDE_PEEK_MENU_ARROW_ID} > svg {
-		width: 0.8em;
-		height: 0.8em;
-		display: block;
-		flex-shrink: 0;
-		color: inherit;
-		transition: transform 200ms ease-out;
-		transform: rotateZ(0deg);
-		opacity: 1;
-		fill: #333;
-	}
-	#${SIDE_PEEK_MENU_ID}.open > #${SIDE_PEEK_MENU_ARROW_ID} > svg,
-	#${SIDE_PEEK_MENU_ARROW_ID}:hover > svg {
-		fill: rgb(35,131,226);
-	}
-	#${SIDE_PEEK_MENU_ID}.active > #${SIDE_PEEK_MENU_ARROW_ID} > svg {
-		fill: #fff;
-	}
-	#${SIDE_PEEK_MENU_ID}.active.open > #${SIDE_PEEK_MENU_ARROW_ID} > svg,
-	#${SIDE_PEEK_MENU_ID}.active > #${SIDE_PEEK_MENU_ARROW_ID}:hover > svg {
-		fill: red;
-	}
-`;
-document.head.appendChild(sidePeekMenuStyle);
+		/* arrow button */
+		#${SIDE_PEEK_MENU_ARROW_ID} {
+			padding: 7px;
+			cursor: pointer;
+		}
+		#${SIDE_PEEK_MENU_ARROW_ID} > svg {
+			width: 0.8em;
+			height: 0.8em;
+			display: block;
+			flex-shrink: 0;
+			color: inherit;
+			transition: transform 200ms ease-out;
+			transform: rotateZ(0deg);
+			opacity: 1;
+			fill: #333;
+		}
+		#${SIDE_PEEK_MENU_ID}.open > #${SIDE_PEEK_MENU_ARROW_ID} > svg,
+		#${SIDE_PEEK_MENU_ARROW_ID}:hover > svg {
+			fill: rgb(35,131,226);
+		}
+		#${SIDE_PEEK_MENU_ID}.active > #${SIDE_PEEK_MENU_ARROW_ID} > svg {
+			fill: #fff;
+		}
+		#${SIDE_PEEK_MENU_ID}.active.open > #${SIDE_PEEK_MENU_ARROW_ID} > svg,
+		#${SIDE_PEEK_MENU_ID}.active > #${SIDE_PEEK_MENU_ARROW_ID}:hover > svg {
+			fill: red;
+		}
+	`;
+	document.head.appendChild(sidePeekMenuStyle);
+};
 
 let sidePeekMenu = null;
 let sidePeekIndicator = null;
@@ -207,8 +209,6 @@ export const buildSidePeekButton = () => {
 	values.id = SIDE_PEEK_MENU_VALUES_ID;
 	sidePeekMenu.appendChild(values);
 
-	topBarButtonsContainer.appendChild(sidePeekButton);
-
 	return sidePeekButton;
 };
 
@@ -239,14 +239,6 @@ function onLinkClick(link, event) {
 function isSidePeekOpen() {
 	return /[?&]p=/.test(location.search);
 }
-function refreshSidePeekMenuStyle() {
-	if (!sidePeekMenu) return;
-
-	sidePeekMenu.classList.toggle("active", isSidePeekOpen())
-}
-onUrlChange(refreshSidePeekMenuStyle);
-window.addEventListener("visibilitychange", refreshSidePeekMenuStyle);
-
 
 // PAGE LINKS
 const pageIds = {

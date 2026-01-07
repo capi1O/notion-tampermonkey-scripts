@@ -1,6 +1,6 @@
 // TOP BAR BUTTONS CONTAINER
-const NOTION_TOPBAR_SELECTOR = ".notion-topbar";
-const NOTION_BREADCRUMB_SELECTOR = ".shadow-cursor-breadcrumb";
+export const NOTION_TOPBAR_SELECTOR = ".notion-topbar";
+export const NOTION_BREADCRUMB_SELECTOR = ".shadow-cursor-breadcrumb";
 const TOP_BAR_BTNS_CONTAINER_ID = "tm-notion-top-bar-btns-container";
 const NOTION_HIDE_CLASS = "tm-notion-hide";
 
@@ -53,6 +53,7 @@ export const attach = (topbar, breadcrumb) => {
 	if (!topbar.contains(b)) {
 		breadcrumb.after(b);
 	}
+	return b;
 }
 
 
