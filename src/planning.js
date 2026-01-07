@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Notion Planning
-// @match        https://www.notion.so/*
+// @match        __PLANNING_URL__
 // ==/UserScript==
 
 import { addDayJumpButtons } from "./planning-day-jump-buttons.js";
