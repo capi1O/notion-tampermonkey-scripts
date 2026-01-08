@@ -23,7 +23,7 @@ export default defineConfig([
 			'semi': ['error', 'always'],
 			'comma-dangle': ['error', 'always-multiline'],
 		},
-		ignores: [],
+		ignores: ['dist/**'],
 	},
 	{
 		files: ['**/*.json'],
@@ -32,6 +32,7 @@ export default defineConfig([
 		},
 		language: 'json/json',
 		extends: ['json/recommended'],
+		ignores: ['package-lock.json'],
 	},
 	{
 		files: ['**/*.md'],
