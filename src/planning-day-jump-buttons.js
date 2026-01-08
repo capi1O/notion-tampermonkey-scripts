@@ -165,6 +165,7 @@ const formatValue = (raw) => {
 		.replace(/^\w/, c => c.toUpperCase());
 };
 
+const parseDate = (v) => new Date(v); // "Jan 8, 2026" → Date
 
 // add or update day buttons
 const updateButtons = () => {
@@ -193,7 +194,21 @@ const updateButtons = () => {
 			btn.textContent = formatValue(value);
 			btn.classList.add(DAY_JUMP_BUTTON_CLASS);
 			btn.onclick = (event) => scrollToGroup({ element, header, value }, event);
-			buttonsContainer.appendChild(btn);
+
+			// if first button just add it
+			if (existingValues.length === 0) {
+				buttonsContainer.appendChild(btn);
+			}
+			// otherwise find position among existing where to insert new button
+			else {
+				const nextValues = [...existingValues, value];
+				const nextValuesSorted = nextValues.sort((a, b) => parseDate(a) - parseDate(b));
+				const position = nextValuesSorted.indexOf(value);
+				const childBefore = buttonsContainer.children[position] || null;
+				// insert at position (will insert last if childBefore is null)
+				buttonsContainer.insertBefore(btn, childBefore);
+			}
+
 		}
 	});
 };
@@ -226,12 +241,12 @@ const getActiveGroup = (groups) => {
 
 const updateActiveButton = () => {
 	if (!buttonsContainerWrapper) {
-		console.log('updateActiveButton - found no buttons container');
+		// console.log('updateActiveButton - found no buttons container');
 		return;
 	}
 	const groups = findGroups();
 	if (!groups.length) {
-		console.log('updateActiveButton - found no groups');
+		// console.log('updateActiveButton - found no groups');
 		return;
 	}
 
@@ -239,10 +254,10 @@ const updateActiveButton = () => {
 
 	// if no active group returned it means it has not changed, return so we don't update unnecessarily
 	if (!activeGroup) {
-		console.log('updateActiveButton - found no active group');
+		// console.log('updateActiveButton - found no active group');
 		return;
 	}
-	else console.log(`updateActiveButton - found active group "${activeGroup.value}"`);
+	// else console.log(`updateActiveButton - found active group "${activeGroup.value}"`);
 
 	[...buttonsContainer.children].forEach(btn =>
 		btn.classList.toggle('active', btn.value === activeGroup.value),
