@@ -150,7 +150,7 @@ export const buildDayButtonsContainer = () => {
 
 	buttonsContainerWrapper.appendChild(buttonsContainer);
 
-	return buttonsContainer;
+	return buttonsContainerWrapper;
 };
 
 const formatValue = (raw) => {
