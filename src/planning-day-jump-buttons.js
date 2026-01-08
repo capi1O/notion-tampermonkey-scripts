@@ -1,6 +1,6 @@
 const GROUP_HEADER_SELECTOR = '.notion-frame .notion-collection_view-block';
-const BTNS_CONTAINER_ID = 'tm-notion-day-jump-btns-container';
 const BTNS_CONTAINER_WRAPPER_ID = 'tm-notion-day-jump-btns-wrapper';
+const BTNS_CONTAINER_ID = 'tm-notion-day-jump-btns-container';
 const DAY_JUMP_BUTTON_CLASS = 'tm-notion-day-jump-btn';
 const LIST_VIEW_ROOT_SELECTOR =
 '.notion-page-content > .notion-selectable.notion-transclusion_reference-block';
@@ -12,7 +12,7 @@ export const appendStyles = () => {
 	const style = document.createElement('style');
 	style.textContent = `
 
-		#${BTNS_CONTAINER_ID} {
+		#${BTNS_CONTAINER_WRAPPER_ID} {
 			overflow: hidden;
 			min-width: 0;
 			flex-grow: 0;
@@ -20,7 +20,7 @@ export const appendStyles = () => {
 			flex-basis: auto;
 		}
 
-		#${BTNS_CONTAINER_WRAPPER_ID} {
+		#${BTNS_CONTAINER_ID} {
 			display: flex;
 			flex-direction: row;
 			align-items: center;
@@ -79,7 +79,7 @@ const findGroups = () => {
 		if (!main) return;
 
 		groups.push({
-			label: labelDiv.innerText.trim(),
+			value: labelDiv.innerText.trim(),
 			header: element,
 			element: main,
 		});
@@ -137,22 +137,23 @@ const scrollToGroup = ({ header, label, element }, event) => {
 	scroller.focus?.();
 };
 
+let buttonsContainerWrapper = null;
 let buttonsContainer = null;
 export const buildDayButtonsContainer = () => {
-	// let buttonsContainer = document.getElementById(BTNS_CONTAINER_ID);
-	if (buttonsContainer) return buttonsContainer;
+	if (buttonsContainerWrapper) return buttonsContainerWrapper;
+
+	buttonsContainerWrapper = document.createElement('div');
+	buttonsContainerWrapper.id = BTNS_CONTAINER_WRAPPER_ID;
 
 	buttonsContainer = document.createElement('div');
 	buttonsContainer.id = BTNS_CONTAINER_ID;
 
-	const buttonsContainerWrapper = document.createElement('div');
-	buttonsContainerWrapper.id = BTNS_CONTAINER_WRAPPER_ID;
-	buttonsContainer.appendChild(buttonsContainerWrapper);
+	buttonsContainerWrapper.appendChild(buttonsContainer);
 
 	return buttonsContainer;
 };
 
-const formatLabel = (raw) => {
+const formatValue = (raw) => {
 	const d = new Date(raw);
 	if (isNaN(d)) return raw;
 
@@ -171,7 +172,7 @@ const updateButtons = () => {
 	// reset to empty
 	// buttonsContainer.innerHTML = "";
 	// get existing buttons
-	const existingLabels = [...buttonsContainer.children].map(btn => btn.value);
+	const existingValues = [...buttonsContainer.children].map(btn => btn.value);
 	// console.log(`updateButtons - existingLabels: ${existingLabels.join(' ')}`);
 	// console.log(`updateButtons - existingLabels`, existingLabels);
 	// [...buttonsContainer.children].forEach(btn => console.log(btn.label));
@@ -183,16 +184,16 @@ const updateButtons = () => {
 	}
 	// else console.log(`updateButtons - found ${groupElements.length} groups`); 
 
-	groups.forEach(({ label, element, header }) => {
+	groups.forEach(({ value, element, header }) => {
 		
 		// create button if it does not already exists
-		if (!existingLabels.includes(label)) {
+		if (!existingValues.includes(value)) {
 			const btn = document.createElement('button');
-			btn.value = label;
-			btn.textContent = formatLabel(label);
+			btn.value = value;
+			btn.textContent = formatValue(value);
 			btn.classList.add(DAY_JUMP_BUTTON_CLASS);
-			btn.onclick = (event) => scrollToGroup({ element, header, label }, event);
-			buttonsContainer.querySelector('div').appendChild(btn);
+			btn.onclick = (event) => scrollToGroup({ element, header, value }, event);
+			buttonsContainer.appendChild(btn);
 		}
 	});
 };
@@ -224,27 +225,27 @@ const getActiveGroup = (groups) => {
 };
 
 const updateActiveButton = () => {
-	if (!buttonsContainer) {
-		// console.log('updateActiveButton - found no buttons container');
+	if (!buttonsContainerWrapper) {
+		console.log('updateActiveButton - found no buttons container');
 		return;
 	}
 	const groups = findGroups();
 	if (!groups.length) {
-		// console.log('updateActiveButton - found no groups');
+		console.log('updateActiveButton - found no groups');
 		return;
 	}
 
-	const active = getActiveGroup(groups);
+	const activeGroup = getActiveGroup(groups);
 
 	// if no active group returned it means it has not changed, return so we don't update unnecessarily
-	if (!active) {
-		// console.log('updateActiveButton - found no active group');
+	if (!activeGroup) {
+		console.log('updateActiveButton - found no active group');
 		return;
 	}
-	// else console.log(`updateActiveButton - found active group ${active.label}`);
+	else console.log(`updateActiveButton - found active group "${activeGroup.value}"`);
 
 	[...buttonsContainer.children].forEach(btn =>
-		btn.classList.toggle('active', btn.value === active.label),
+		btn.classList.toggle('active', btn.value === activeGroup.value),
 	);
 };
 
