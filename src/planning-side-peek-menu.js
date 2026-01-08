@@ -217,8 +217,11 @@ const getActiveLink = () => {
 	return activeLink;
 };
 
+// eslint-disable-next-line no-unused-vars
 const onLinkClick = (link, event) => {
 	
+	// event.preventDefault();
+
 	// 0. check if click linked is not already active
 	// eslint-disable-next-line no-extra-boolean-cast
 	if (!!link.closest(`.${SIDE_PEEK_MENU_ACTIVE_VALUE_ID}`)) return;

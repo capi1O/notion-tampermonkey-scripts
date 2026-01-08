@@ -100,7 +100,8 @@ const getScroller = () => {
 	return document.querySelector('.notion-frame > .notion-selectable-container > .notion-scroller.vertical');
 };
 
-const scrollToGroup = ({ header, label, element }) => {
+// eslint-disable-next-line no-unused-vars
+const scrollToGroup = ({ header, label, element }, event) => {
 
 	const scroller = getScroller();
 	if (!scroller) return;
@@ -190,7 +191,7 @@ const updateButtons = () => {
 			btn.value = label;
 			btn.textContent = formatLabel(label);
 			btn.classList.add(DAY_JUMP_BUTTON_CLASS);
-			btn.onclick = (event) => scrollToGroup({ element, header, label });
+			btn.onclick = (event) => scrollToGroup({ element, header, label }, event);
 			buttonsContainer.querySelector('div').appendChild(btn);
 		}
 	});

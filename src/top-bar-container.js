@@ -105,7 +105,7 @@ export const hideFlexibleSpace = (topbar) => {
 			// const flexibleSpace = potentialFlexibleSpace
 			potentialFlexibleSpace
 				.forEach(div => {
-					const followedByActionButtons = div.nextElementSibling?.classList.contains('notion-topbar-action-buttons');
+					// const followedByActionButtons = div.nextElementSibling?.classList.contains('notion-topbar-action-buttons');
 					// const style = getComputedStyle(div);
 					// const isFlex = style.flexGrow === '1' && style.flexShrink === '1';
 					const s = div.getAttribute('style') || '';
