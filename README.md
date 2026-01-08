@@ -20,23 +20,31 @@ Those buttons are added to Notion top bar
 ## Dev
 
 ### In Chrome
-npm run watch
 
-Copy-paste this in Tampermonkey editor
+1. `npm run dev`
 
-```js
-// ==UserScript==
-// @require file:///ABSOLUTE_PATH/dist/FILENAME.user.js
-// ==/UserScript==
-```
+2. Copy-paste this in Tampermonkey editor
 
-in TM
-file:// works only if Tampermonkey setting “Allow access to file URLs” is enabled
+	```js
+	// ==UserScript==
+	// @require file:///ABSOLUTE_PATH/dist/FILENAME.user.js
+	// ==/UserScript==
+	```
+
+
+> 💡 **Info**
+>
+> file:// works only if Tampermonkey setting “Allow access to file URLs” is enabled
+
 
 ### In Firefox
 
-npm run watch
-TM > Settings > Import from file > select file from dist/
-Whenever file is updated you need to manually "Reinstall from file" from TM settings
+1. `npm run dev`
 
-about:config → security.fileuri.strict_origin_policy = false
+2. Tampermonkey > Settings > Utilites > Import from file > Browse. Then select file from dist/. Whenever file is updated you need to manually "Reinstall from file" from Tampermonkey Settings > Utilites.
+
+
+> 💡 **Info**
+>
+> about:config → security.fileuri.strict_origin_policy = false
+
