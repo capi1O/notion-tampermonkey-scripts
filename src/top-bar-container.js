@@ -43,19 +43,39 @@ export const buildTopBarButtonsContainer = () => {
 	return topBarButtonsContainer;
 };
 
-// insert top bar buttons container inside Notion top bar
-export const attach = (topbar, breadcrumb) => {
-	if (getComputedStyle(topbar).position === "static") {
-		topbar.style.position = "relative";
-	}
 
-	const b = buildTopBarButtonsContainer();
-	if (!topbar.contains(b)) {
-		breadcrumb.after(b);
-	}
-	return b;
-}
+// attach container to Notion top bar when it is loaded
+export const attachContainerToNotionTopBarWhenReadyThen = (callback) => {
 
+	const attachObserver = new MutationObserver(() => {
+		const topbar = document.querySelector(NOTION_TOPBAR_SELECTOR);
+		if (topbar) {
+				const breadcrumb = topbar.querySelector(NOTION_BREADCRUMB_SELECTOR);
+				if (breadcrumb) {
+					attachObserver.disconnect();
+					// console.log('topbar and breadcrumb found, attaching');
+
+					// if (getComputedStyle(topbar).position === "static") topbar.style.position = "relative";
+
+					const topBarButtonsContainer = buildTopBarButtonsContainer();
+					
+					// attach to Notion top bar (after breadcrumb)
+					if (!topbar.contains(topBarButtonsContainer)) breadcrumb.after(topBarButtonsContainer);
+
+					repositionTopBarButtonsContainer();
+
+					callback(topBarButtonsContainer);
+				}
+				// else console.log('breadcrumb not found');
+
+				// wait for flexible space to appear then hide it
+				hideFlexibleSpace(topbar); // TODO: rename + prevent observer from being added multiple times
+		}
+		// else  console.log('topbar not found');
+	});
+	attachObserver.observe(document.body, { childList: true, subtree: true });
+
+};
 
 export const repositionTopBarButtonsContainer = () => {
 	if (!topBarButtonsContainer) return;

@@ -3,8 +3,8 @@
 // @match        __PLANNING_URL__
 // ==/UserScript==
 
-import { NOTION_TOPBAR_SELECTOR, NOTION_BREADCRUMB_SELECTOR, appendStyles as appendTopBarContainerStyles, attach, repositionTopBarButtonsContainer, hideFlexibleSpace } from "./top-bar-container.js";
-import { appendStyles as appendDayButtonsStyles, buildDayButtonsContainer, watchAndUpdateButtons } from "./planning-day-jump-buttons.js";
+import { appendStyles as appendTopBarContainerStyles, repositionTopBarButtonsContainer, attachContainerToNotionTopBarWhenReadyThen } from "./top-bar-container.js";
+import { appendStyles as appendDayButtonsStyles, buildDayButtonsContainer, watchContentAndUpdateButtons } from "./planning-day-jump-buttons.js";
 import { appendStyles as appendSidePeekMenuStyles, buildSidePeekButton, movePageLinksToMenu, refreshSidePeekStyle } from "./planning-side-peek-menu.js";
 import { onUrlChange } from './utils.js';
 
@@ -13,38 +13,17 @@ appendTopBarContainerStyles();
 appendSidePeekMenuStyles();
 appendDayButtonsStyles();
 
-// attach elements to Notion top bar when it is loaded
-const attachObserver = new MutationObserver(() => {
-	const topbar = document.querySelector(NOTION_TOPBAR_SELECTOR);
-	if (topbar) {
-			const breadcrumb = topbar.querySelector(NOTION_BREADCRUMB_SELECTOR);
-			if (breadcrumb) {
-				attachObserver.disconnect();
-				// console.log('topbar and breadcrumb found, attaching');
+attachContainerToNotionTopBarWhenReadyThen((topBarButtonsContainer) => {
+	const dayButtonsContainer = buildDayButtonsContainer();
+	topBarButtonsContainer.appendChild(dayButtonsContainer);
+	watchContentAndUpdateButtons();
 
-				// attach to Notion top bar
-				const topBarButtonsContainer = attach(topbar, breadcrumb);
-				repositionTopBarButtonsContainer();
+	const sidePeekButton = buildSidePeekButton();
+	topBarButtonsContainer.appendChild(sidePeekButton);
+	movePageLinksToMenu();
+})
 
-				const dayButtonsContainer = buildDayButtonsContainer();
-				topBarButtonsContainer.appendChild(dayButtonsContainer);
-				watchAndUpdateButtons();
 
-				const sidePeekButton = buildSidePeekButton();
-				topBarButtonsContainer.appendChild(sidePeekButton);
-				movePageLinksToMenu();
-			}
-			// else console.log('breadcrumb not found');
-
-			// wait for flexible space to appear then hide it
-			hideFlexibleSpace(topbar);
-	}
-	// else  console.log('topbar not found');
-});
-attachObserver.observe(document.body, { childList: true, subtree: true });
-
-window.addEventListener("resize", repositionTopBarButtonsContainer);
-window.addEventListener("scroll", repositionTopBarButtonsContainer, true);
 
 // reactive updates (read-only)
 const reactiveObserver = new MutationObserver(() => {
@@ -52,11 +31,12 @@ const reactiveObserver = new MutationObserver(() => {
 	movePageLinksToMenu(); // not really read-only but required to move link on load
 	refreshSidePeekStyle();
 });
-
 reactiveObserver.observe(document.body, { childList: true, subtree: true });
 
-window.addEventListener("resize", movePageLinksToMenu);
-window.addEventListener("scroll", movePageLinksToMenu, true);
+window.addEventListener("resize", repositionTopBarButtonsContainer); // redundant with reactiveObserver?
+window.addEventListener("scroll", repositionTopBarButtonsContainer, true); // redundant with reactiveObserver?
+window.addEventListener("resize", movePageLinksToMenu); // redundant with reactiveObserver?
+window.addEventListener("scroll", movePageLinksToMenu, true); // redundant with reactiveObserver?
 
 onUrlChange(refreshSidePeekStyle);
 window.addEventListener("visibilitychange", refreshSidePeekStyle);

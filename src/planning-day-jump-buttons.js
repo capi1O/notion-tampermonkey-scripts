@@ -312,7 +312,7 @@ function waitForListStabilized(cb, delay = 150) {
 // 	scroller.scrollTop -= 1;
 // }
 
-export const watchAndUpdateButtons = () => {
+export const watchContentAndUpdateButtons = () => {
 
 	observeListView(() => { updateButtons(); }); // will trigger updateButtons() if listview changes
 
