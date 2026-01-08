@@ -1,0 +1,42 @@
+# Notion Tampermonkey sripts
+
+## Description
+
+Collection of [Tampermonkey](https://github.com/Tampermonkey/tampermonkey) scripts to enhance Notion experience on desktop.
+
+### Wildcard
+
+Script applied to all Notion pages, what it does:
+- hide Notion AI assitant
+
+### Planning
+
+Script tailored to a specific "Planning" page on my Notion, what it does:
+- add buttons to jump scroll to each day group
+- add drop down menu to open set of links in Side Peek
+
+Those buttons are added to Notion top bar
+
+## Dev
+
+### In Chrome
+npm run watch
+
+Copy-paste this in Tampermonkey editor
+
+```js
+// ==UserScript==
+// @require file:///ABSOLUTE_PATH/dist/FILENAME.user.js
+// ==/UserScript==
+```
+
+in TM
+file:// works only if Tampermonkey setting “Allow access to file URLs” is enabled
+
+### In Firefox
+
+npm run watch
+TM > Settings > Import from file > select file from dist/
+Whenever file is updated you need to manually "Reinstall from file" from TM settings
+
+about:config → security.fileuri.strict_origin_policy = false
