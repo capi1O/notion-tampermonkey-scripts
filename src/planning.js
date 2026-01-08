@@ -3,20 +3,17 @@
 // @match        __PLANNING_URL__
 // ==/UserScript==
 
-import { addDayJumpButtons } from "./planning-day-jump-buttons.js";
+import { appendStyles as appendDayButtonsStyles, buildDayButtonsContainer, watchAndUpdateButtons } from "./planning-day-jump-buttons.js";
 import { NOTION_TOPBAR_SELECTOR, NOTION_BREADCRUMB_SELECTOR, appendStyles as appendTopBarContainerStyles, attach, repositionTopBarButtonsContainer, hideFlexibleSpace } from "./top-bar-container.js";
 import { appendStyles as appendSidePeekMenuStyles, buildSidePeekButton, movePageLinksToMenu, refreshSidePeekStyle } from "./planning-side-peek-menu.js";
 import { onUrlChange } from './utils.js';
 
-// day jump buttons
-// addDayJumpButtons();
 
-// side peek buttons
 appendTopBarContainerStyles();
 appendSidePeekMenuStyles();
+appendDayButtonsStyles();
 
-
-// TODO: reuse
+// attach elements to Notion top bar when it is loaded
 const attachObserver = new MutationObserver(() => {
 	const topbar = document.querySelector(NOTION_TOPBAR_SELECTOR);
 	if (topbar) {
@@ -24,8 +21,15 @@ const attachObserver = new MutationObserver(() => {
 			if (breadcrumb) {
 				attachObserver.disconnect();
 				// console.log('topbar and breadcrumb found, attaching');
+
+				// attach to Notion top bar
 				const topBarButtonsContainer = attach(topbar, breadcrumb);
 				repositionTopBarButtonsContainer();
+
+				const dayButtonsContainer = buildDayButtonsContainer();
+				topBarButtonsContainer.appendChild(dayButtonsContainer);
+				watchAndUpdateButtons();
+
 				const sidePeekButton = buildSidePeekButton();
 				topBarButtonsContainer.appendChild(sidePeekButton);
 				movePageLinksToMenu();
@@ -37,7 +41,6 @@ const attachObserver = new MutationObserver(() => {
 	}
 	// else  console.log('topbar not found');
 });
-
 attachObserver.observe(document.body, { childList: true, subtree: true });
 
 window.addEventListener("resize", repositionTopBarButtonsContainer);

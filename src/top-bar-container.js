@@ -33,7 +33,7 @@ export const appendStyles = () => {
 };
 
 let topBarButtonsContainer = null;
-const buildTopBarButtonsContainer = () => {
+export const buildTopBarButtonsContainer = () => {
 	// let buttonsContainer = document.getElementById(BTNS_CONTAINER_ID);
 	if (topBarButtonsContainer) return topBarButtonsContainer;
 	
@@ -43,7 +43,7 @@ const buildTopBarButtonsContainer = () => {
 	return topBarButtonsContainer;
 };
 
-// TODO: reuse
+// insert top bar buttons container inside Notion top bar
 export const attach = (topbar, breadcrumb) => {
 	if (getComputedStyle(topbar).position === "static") {
 		topbar.style.position = "relative";
