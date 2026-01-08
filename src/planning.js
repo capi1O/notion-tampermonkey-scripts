@@ -3,8 +3,8 @@
 // @match        __PLANNING_URL__
 // ==/UserScript==
 
-import { appendStyles as appendDayButtonsStyles, buildDayButtonsContainer, watchAndUpdateButtons } from "./planning-day-jump-buttons.js";
 import { NOTION_TOPBAR_SELECTOR, NOTION_BREADCRUMB_SELECTOR, appendStyles as appendTopBarContainerStyles, attach, repositionTopBarButtonsContainer, hideFlexibleSpace } from "./top-bar-container.js";
+import { appendStyles as appendDayButtonsStyles, buildDayButtonsContainer, watchAndUpdateButtons } from "./planning-day-jump-buttons.js";
 import { appendStyles as appendSidePeekMenuStyles, buildSidePeekButton, movePageLinksToMenu, refreshSidePeekStyle } from "./planning-side-peek-menu.js";
 import { onUrlChange } from './utils.js';
 
