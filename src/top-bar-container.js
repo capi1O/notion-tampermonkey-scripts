@@ -1,12 +1,12 @@
 // TOP BAR BUTTONS CONTAINER
-export const NOTION_TOPBAR_SELECTOR = ".notion-topbar";
-export const NOTION_BREADCRUMB_SELECTOR = ".shadow-cursor-breadcrumb";
-const TOP_BAR_BTNS_CONTAINER_ID = "tm-notion-top-bar-btns-container";
-const NOTION_HIDE_CLASS = "tm-notion-hide";
+export const NOTION_TOPBAR_SELECTOR = '.notion-topbar';
+export const NOTION_BREADCRUMB_SELECTOR = '.shadow-cursor-breadcrumb';
+const TOP_BAR_BTNS_CONTAINER_ID = 'tm-notion-top-bar-btns-container';
+const NOTION_HIDE_CLASS = 'tm-notion-hide';
 
 // buttons container is added to top bar (.notion-frame) and manually styled to match target width
 const TARGET_SELECTOR =
-".notion-frame > .notion-selectable-container > .notion-scroller.vertical > div > .layout > .layout-content";
+'.notion-frame > .notion-selectable-container > .notion-scroller.vertical > div > .layout > .layout-content';
 
 export const appendStyles = () => {
 
@@ -37,7 +37,7 @@ export const buildTopBarButtonsContainer = () => {
 	// let buttonsContainer = document.getElementById(BTNS_CONTAINER_ID);
 	if (topBarButtonsContainer) return topBarButtonsContainer;
 	
-	topBarButtonsContainer = document.createElement("div");
+	topBarButtonsContainer = document.createElement('div');
 	topBarButtonsContainer.id = TOP_BAR_BTNS_CONTAINER_ID;
 
 	return topBarButtonsContainer;
@@ -50,26 +50,26 @@ export const attachContainerToNotionTopBarWhenReadyThen = (callback) => {
 	const attachObserver = new MutationObserver(() => {
 		const topbar = document.querySelector(NOTION_TOPBAR_SELECTOR);
 		if (topbar) {
-				const breadcrumb = topbar.querySelector(NOTION_BREADCRUMB_SELECTOR);
-				if (breadcrumb) {
-					attachObserver.disconnect();
-					// console.log('topbar and breadcrumb found, attaching');
+			const breadcrumb = topbar.querySelector(NOTION_BREADCRUMB_SELECTOR);
+			if (breadcrumb) {
+				attachObserver.disconnect();
+				// console.log('topbar and breadcrumb found, attaching');
 
-					// if (getComputedStyle(topbar).position === "static") topbar.style.position = "relative";
+				// if (getComputedStyle(topbar).position === "static") topbar.style.position = "relative";
 
-					const topBarButtonsContainer = buildTopBarButtonsContainer();
+				const topBarButtonsContainer = buildTopBarButtonsContainer();
 					
-					// attach to Notion top bar (after breadcrumb)
-					if (!topbar.contains(topBarButtonsContainer)) breadcrumb.after(topBarButtonsContainer);
+				// attach to Notion top bar (after breadcrumb)
+				if (!topbar.contains(topBarButtonsContainer)) breadcrumb.after(topBarButtonsContainer);
 
-					repositionTopBarButtonsContainer();
+				repositionTopBarButtonsContainer();
 
-					callback(topBarButtonsContainer);
-				}
-				// else console.log('breadcrumb not found');
+				callback(topBarButtonsContainer);
+			}
+			// else console.log('breadcrumb not found');
 
-				// wait for flexible space to appear then hide it
-				hideFlexibleSpace(topbar); // TODO: rename + prevent observer from being added multiple times
+			// wait for flexible space to appear then hide it
+			hideFlexibleSpace(topbar); // TODO: rename + prevent observer from being added multiple times
 		}
 		// else  console.log('topbar not found');
 	});
@@ -96,7 +96,7 @@ export const repositionTopBarButtonsContainer = () => {
 export const hideFlexibleSpace = (topbar) => {
 	// console.log('hideFlexibleSpace')
 	const flexSpaceObserver = new MutationObserver(() => {
-		const potentialFlexibleSpace = [...topbar.querySelectorAll('.notion-selectable-container > div > div')]
+		const potentialFlexibleSpace = [...topbar.querySelectorAll('.notion-selectable-container > div > div')];
 		// const potentialFlexibleSpace = topbar.querySelector('.notion-selectable-container > div > div [style*="flex-grow: 1"][style*="flex-shrink: 1"]')
 
 		if (potentialFlexibleSpace.length > 0) {
@@ -121,6 +121,6 @@ export const hideFlexibleSpace = (topbar) => {
 		// else console.log('found no potential flexible space')
 	});
 	flexSpaceObserver.observe(topbar, { childList: true, subtree: true });
-}
+};
 
 

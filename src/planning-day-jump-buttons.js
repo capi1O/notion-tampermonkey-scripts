@@ -1,9 +1,9 @@
-const GROUP_HEADER_SELECTOR = ".notion-frame .notion-collection_view-block";
-const BTNS_CONTAINER_ID = "tm-notion-day-jump-btns-container";
-const BTNS_CONTAINER_WRAPPER_ID = "tm-notion-day-jump-btns-wrapper";
-const DAY_JUMP_BUTTON_CLASS = "tm-notion-day-jump-btn";
+const GROUP_HEADER_SELECTOR = '.notion-frame .notion-collection_view-block';
+const BTNS_CONTAINER_ID = 'tm-notion-day-jump-btns-container';
+const BTNS_CONTAINER_WRAPPER_ID = 'tm-notion-day-jump-btns-wrapper';
+const DAY_JUMP_BUTTON_CLASS = 'tm-notion-day-jump-btn';
 const LIST_VIEW_ROOT_SELECTOR =
-".notion-page-content > .notion-selectable.notion-transclusion_reference-block";
+'.notion-page-content > .notion-selectable.notion-transclusion_reference-block';
 
 
 export const appendStyles = () => {
@@ -50,14 +50,14 @@ export const appendStyles = () => {
 
 };
 
-function findGroups() {
+const findGroups = () => {
 	const candidates = document.querySelectorAll(GROUP_HEADER_SELECTOR);
 
 	const groups = [];
 
 	candidates.forEach(element => {
 		// Exclude list items
-		if (element.classList.contains("notion-collection-item")) return;
+		if (element.classList.contains('notion-collection-item')) return;
 
 		// Must have a caret button
 		const caret = element.querySelector(':scope > div[role="button"]');
@@ -65,9 +65,9 @@ function findGroups() {
 
 		// Must have a text label (second div, text-only)
 		const labelDiv = [...element.children].find(c =>
-			c.tagName === "DIV" &&
+			c.tagName === 'DIV' &&
 			c.children.length === 0 &&
-			c.innerText?.trim()
+			c.innerText?.trim(),
 		);
 		if (!labelDiv) return;
 
@@ -81,26 +81,26 @@ function findGroups() {
 		groups.push({
 			label: labelDiv.innerText.trim(),
 			header: element,
-			element: main
+			element: main,
 		});
 	});
 
 	groups.sort(
 		(a, b) =>
 			a.element.getBoundingClientRect().top -
-			b.element.getBoundingClientRect().top
+			b.element.getBoundingClientRect().top,
 	);
 
 	return groups;
-}
+};
 
 
 
-function getScroller() {
-	return document.querySelector(".notion-frame > .notion-selectable-container > .notion-scroller.vertical");
-}
+const getScroller = () => {
+	return document.querySelector('.notion-frame > .notion-selectable-container > .notion-scroller.vertical');
+};
 
-function scrollToGroup({ header, label, element }) {
+const scrollToGroup = ({ header, label, element }) => {
 
 	const scroller = getScroller();
 	if (!scroller) return;
@@ -118,54 +118,54 @@ function scrollToGroup({ header, label, element }) {
 
 	const nextScrollValue = currentScrollValue + nextGroupTopFromScrollView;
 
-// 		console.log(
-// `%c
-// scrolling ${goingup ? 'up' : 'down'} to group ${label}\n
-// current scroll value: ${currentScrollValue}\n
-// scroll view position from top of VP: ${scrollViewTopFromViewport}\n
-// next group position from top of VP: ${nextGroupTopFromViewport}\n
-// next group position from top of scroll view: ${nextGroupTopFromScrollView}\n
-// next scroll value ${nextScrollValue}\n
-// `, "color:#3b82f6");
+	// 		console.log(
+	// `%c
+	// scrolling ${goingup ? 'up' : 'down'} to group ${label}\n
+	// current scroll value: ${currentScrollValue}\n
+	// scroll view position from top of VP: ${scrollViewTopFromViewport}\n
+	// next group position from top of VP: ${nextGroupTopFromViewport}\n
+	// next group position from top of scroll view: ${nextGroupTopFromScrollView}\n
+	// next scroll value ${nextScrollValue}\n
+	// `, "color:#3b82f6");
 
 	scroller.scrollTo({
 		top: nextScrollValue,
-		behavior: "smooth"
+		behavior: 'smooth',
 	});
 
 	scroller.focus?.();
-}
+};
 
 let buttonsContainer = null;
 export const buildDayButtonsContainer = () => {
 	// let buttonsContainer = document.getElementById(BTNS_CONTAINER_ID);
 	if (buttonsContainer) return buttonsContainer;
 
-	buttonsContainer = document.createElement("div");
+	buttonsContainer = document.createElement('div');
 	buttonsContainer.id = BTNS_CONTAINER_ID;
 
-	const buttonsContainerWrapper = document.createElement("div");
+	const buttonsContainerWrapper = document.createElement('div');
 	buttonsContainerWrapper.id = BTNS_CONTAINER_WRAPPER_ID;
 	buttonsContainer.appendChild(buttonsContainerWrapper);
 
 	return buttonsContainer;
 };
 
-function formatLabel(raw) {
+const formatLabel = (raw) => {
 	const d = new Date(raw);
 	if (isNaN(d)) return raw;
 
-	return new Intl.DateTimeFormat("fr-FR", {
-		weekday: "long",
-		day: "numeric"
+	return new Intl.DateTimeFormat('fr-FR', {
+		weekday: 'long',
+		day: 'numeric',
 	})
 		.format(d)
 		.replace(/^\w/, c => c.toUpperCase());
-}
+};
 
 
 // add or update day buttons
-function updateButtons() {
+const updateButtons = () => {
 
 	// reset to empty
 	// buttonsContainer.innerHTML = "";
@@ -186,7 +186,7 @@ function updateButtons() {
 		
 		// create button if it does not already exists
 		if (!existingLabels.includes(label)) {
-			const btn = document.createElement("button");
+			const btn = document.createElement('button');
 			btn.value = label;
 			btn.textContent = formatLabel(label);
 			btn.classList.add(DAY_JUMP_BUTTON_CLASS);
@@ -194,12 +194,12 @@ function updateButtons() {
 			buttonsContainer.querySelector('div').appendChild(btn);
 		}
 	});
-}
+};
 
 const VISIBILITY_OFFSET = 90; // height of top header .notion-topbar
 
 let lastActiveGroup = null;
-function getActiveGroup(groups) {
+const getActiveGroup = (groups) => {
 
 	let activeGroup;
 
@@ -220,9 +220,9 @@ function getActiveGroup(groups) {
 	// otherwise return null to indicate no change
 	else return null;
 
-}
+};
 
-function updateActiveButton() {
+const updateActiveButton = () => {
 	if (!buttonsContainer) {
 		// console.log('updateActiveButton - found no buttons container');
 		return;
@@ -243,13 +243,13 @@ function updateActiveButton() {
 	// else console.log(`updateActiveButton - found active group ${active.label}`);
 
 	[...buttonsContainer.children].forEach(btn =>
-		btn.classList.toggle("active", btn.value === active.label)
+		btn.classList.toggle('active', btn.value === active.label),
 	);
-}
+};
 
 let listObserver = null;
 
-function observeListView(cb) {
+const observeListView = (cb) => {
 	if (listObserver) return;
 
 	const listRoot = document.querySelector(LIST_VIEW_ROOT_SELECTOR);
@@ -261,18 +261,18 @@ function observeListView(cb) {
 
 	listObserver.observe(listRoot, {
 		childList: true,
-		subtree: true
+		subtree: true,
 	});
-}
+};
 
-function observeScroll(cb) {
+const observeScroll = (cb) => {
 	const scroller = getScroller();
 	if (!scroller) return;
 
-	scroller.addEventListener("scroll", cb, { passive: true });
-}
+	scroller.addEventListener('scroll', cb, { passive: true });
+};
 
-function waitForListStabilized(cb, delay = 150) {
+const waitForListStabilized = (cb, delay = 150) => {
 	let last = 0;
 	let stableTimer = null;
 
@@ -282,7 +282,7 @@ function waitForListStabilized(cb, delay = 150) {
 
 		const totalHeight = groups.reduce(
 			(s, g) => s + g.element.getBoundingClientRect().height,
-			0
+			0,
 		);
 
 		if (Math.abs(totalHeight - last) < 2) {
@@ -301,16 +301,16 @@ function waitForListStabilized(cb, delay = 150) {
 
 	obs.observe(
 		document.querySelector(LIST_VIEW_ROOT_SELECTOR),
-		{ childList: true, subtree: true }
+		{ childList: true, subtree: true },
 	);
-}
+};
 
-// function nudgeScroller() {updateButtons
+// const nudgeScroller = () => {updateButtons
 // 	const scroller = getScroller();
 // 	if (!scroller) return;
 // 	scroller.scrollTop += 1;
 // 	scroller.scrollTop -= 1;
-// }
+// };
 
 export const watchContentAndUpdateButtons = () => {
 

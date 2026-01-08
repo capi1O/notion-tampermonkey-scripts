@@ -12,5 +12,5 @@ export const onUrlChange = (cb) => {
 		cb();
 	};
 
-	window.addEventListener("popstate", cb);
+	window.addEventListener('popstate', cb);
 };
