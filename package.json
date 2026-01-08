@@ -9,13 +9,19 @@
 		"dev:wildcard": "rollup -c rollup.wildcard.config.js -w",
 		"build:planning": "rollup -c rollup.planning.config.js",
 		"build:wildcard": "rollup -c rollup.wildcard.config.js",
-		"build": "npm run build:planning && npm run build:wildcard"
+		"build": "npm run build:planning && npm run build:wildcard",
+		"lint": "eslint src"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"description": "",
 	"devDependencies": {
+		"@eslint/js": "^9.39.2",
+		"@eslint/json": "^0.14.0",
+		"@eslint/markdown": "^7.5.1",
+		"eslint": "^9.39.2",
+		"globals": "^17.0.0",
 		"rollup": "^4.55.1"
 	}
 }
